@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<canvas id="canvas2d" width="640" height="480"></canvas>
-<canvas id="canvasgl" width="640" height="480"></canvas>
+<canvas id="canvas2d" width="320" height="240"></canvas>
+<canvas id="canvasgl" width="320" height="240"></canvas>
 <script id="drawImage-vertex-shader" type="x-shader/x-vertex">
    precision mediump float;
    attribute vec3 pos;
@@ -15,9 +15,10 @@
    precision mediump float;
    varying vec2 uv;
    uniform sampler2D texture;
+   uniform float time;
 
    void main(void) {
-      gl_FragColor = texture2D(texture, uv).yxzw; 
+      gl_FragColor = texture2D(texture, uv + vec2(cos(time* 0.05) * 0.014, sin(time * 0.25) * 0.05)).yxzw; 
    }
    </script>
   <script id="drawImage-fragfbo-shader" type="x-shader/x-fragment">
@@ -26,7 +27,7 @@
    uniform sampler2D texture;
 
    void main(void) {
-      gl_FragColor = texture2D(texture, vec2(uv.x, 1.0 - uv.y)).yxzw; 
+      gl_FragColor = texture2D(texture, vec2(uv.x, 1.0 - uv.y)); 
    }
    </script>
 
