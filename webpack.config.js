@@ -33,9 +33,10 @@ module.exports = {
           }
       ]
   },
-  externals: {
+  externals: [
+    {
       "react": "React",
-      "react-dom": "ReactDOM",
-      "@material-ui/core": externalMaterialUI
-  }
+      "react-dom": "ReactDOM"
+    },
+  ]
 }

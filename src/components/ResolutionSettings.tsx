@@ -1,11 +1,10 @@
 import * as React from "react"
-import {ICanvas} from '../ICanvas'
-import {Button} from '@material-ui/core'
+import { ICanvas } from '../interfaces/ICanvas'
 
 export interface ResolutionFormProps { canvas: ICanvas }
 
-export class ResolutionForm extends React.Component<ResolutionFormProps, {}>  {
-  state: {width: number, height: number, canvas: ICanvas}
+export class ResolutionSettings extends React.Component<ResolutionFormProps, {}>  {
+  state: { width: number, height: number, canvas: ICanvas }
   constructor(props: ResolutionFormProps) {
     super(props);
     this.state = {
@@ -34,15 +33,12 @@ export class ResolutionForm extends React.Component<ResolutionFormProps, {}>  {
     }
 
     this.state.canvas.onResolutionChanged(width, height)
-    this.setState({width: width, height: height, canvas: this.state.canvas})
+    this.setState({ width: width, height: height, canvas: this.state.canvas })
   }
 
   render() {
     return (
-      <div style={{padding: 10}}>
-        <Button variant="contained" color="primary">
-      Hello World
-    </Button>
+      <div style={{ padding: 10 }}>
         <span>Width: </span>
         <input type="text" value={this.state.width} name="canvas-width" onChange={this.handleChange} />
 

@@ -1,6 +1,7 @@
 class ShaderProgram {
   gl: WebGLRenderingContext
   program: WebGLProgram
+
   constructor(gl: WebGLRenderingContext, vertSource: string, fragSource: string) {
     this.gl = gl
 

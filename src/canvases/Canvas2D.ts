@@ -1,4 +1,4 @@
-export class CanvasOut {
+export class Canvas2D {
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
   constructor(canvas: HTMLCanvasElement) {
@@ -13,7 +13,7 @@ export class CanvasOut {
   drawText(text:string) {
     let ctx = this.ctx
     let canvas = this.canvas
-    ctx.fillStyle = "orange"
+    ctx.fillStyle = "white"
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     ctx.fillStyle = "black"
 

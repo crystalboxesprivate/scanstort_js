@@ -1,7 +1,23 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+<meta charset="utf-8">
+<style type="text/css">
+   #render {
+      width: 1024px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto
+   }
 
+   .canvases canvas {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 640px;
+   }
+   .curve-editor {
+      border: 1px solid black;
+   }
+</style>
 <div id='render'></div>
 <script id="vert" type="x-shader/x-vertex">
    precision mediump float;
@@ -13,7 +29,7 @@
      uv = vec2(pos.x, 1.0 - pos.y);
    }
   </script>
-   <script id="frag" type="x-shader/x-fragment">
+<script id="frag" type="x-shader/x-fragment">
       precision mediump float;
       varying vec2 uv;
       uniform sampler2D texture;
@@ -31,5 +47,4 @@
 
 <script src="./node_modules/react/umd/react.development.js"></script>
 <script src="./node_modules/react-dom/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js"></script>
 <script src="./dist/main.js"></script>
