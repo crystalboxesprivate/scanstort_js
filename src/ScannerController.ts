@@ -44,13 +44,7 @@ export class ScannerController implements ICanvas {
 
     var pixel = canvas2d.ctx.getImageData(0, 0, width, height)
     canvasGl.loadPixels(pixel.data, width, height)
-
-    let image = canvasGl.scan(0)
-    for (let x = 1; x < this.getHeight(); x++) {
-      image = merge(image, canvasGl.scan(x))
-    }
-    canvasGl.loadPixels(image, width, height)
-    canvasGl.draw()
+    canvasGl.drawGpu()
   }
 
   init() {

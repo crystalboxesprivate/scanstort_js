@@ -13,7 +13,7 @@ export class CanvasOut {
   drawText(text:string) {
     let ctx = this.ctx
     let canvas = this.canvas
-    ctx.fillStyle = "white"
+    ctx.fillStyle = "orange"
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     ctx.fillStyle = "black"
 

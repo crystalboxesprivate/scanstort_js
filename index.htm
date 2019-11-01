@@ -29,7 +29,21 @@
       gl_FragColor = texture2D(texture, vec2(uv.x, 1.0 - uv.y)); 
    }
    </script>
+   <script id="drawImage-fragGPU-shader" type="x-shader/x-fragment">
+      precision mediump float;
+      varying vec2 uv;
+      uniform sampler2D texture;
+      uniform vec2 resolution;
 
+      vec2 getOffset(float time) {
+         return vec2(cos(time* 0.05) * 0.014, sin(time * 0.25) * 0.05);
+      }
+   
+      void main(void) {
+         float time = uv.y * resolution.y;
+         gl_FragColor = texture2D(texture, uv + getOffset(time)); 
+      }
+   </script>
 
 <script src="./node_modules/react/umd/react.development.js"></script>
 <script src="./node_modules/react-dom/umd/react-dom.development.js"></script>

@@ -6,8 +6,8 @@ import { ResolutionForm } from './components/ResolutionForm'
 import { ScannerController } from './ScannerController'
 import { ICanvas } from './ICanvas'
 
-let initialWidth = 640
-let initialHeight = 480
+let initialWidth = 320
+let initialHeight = 240
 let controller = new ScannerController(initialWidth,
   initialHeight)
 

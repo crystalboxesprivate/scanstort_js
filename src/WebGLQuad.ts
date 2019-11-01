@@ -52,6 +52,7 @@ export class WebGLQuad {
 
   shaderFramebuffer: ShaderProgram
   shaderMain: ShaderProgram
+  shaderGPU: ShaderProgram
 
   fb: WebGLFramebuffer | null = null
 
@@ -69,6 +70,10 @@ export class WebGLQuad {
     this.shaderMain = new ShaderProgram(this.gl,
       (<HTMLElement>document.getElementById('drawImage-vertex-shader')).innerText,
       (<HTMLElement>document.getElementById('drawImage-fragfbo-shader')).innerText)
+    
+    this.shaderGPU = new ShaderProgram(this.gl,
+      (<HTMLElement>document.getElementById('drawImage-vertex-shader')).innerText,
+      (<HTMLElement>document.getElementById('drawImage-fragGPU-shader')).innerText)
 
     this.initFramebuffer()
     this.initVertexBuffer([
@@ -103,6 +108,7 @@ export class WebGLQuad {
     // attach the texture as the first color attachment
     const attachmentPoint = gl.COLOR_ATTACHMENT0
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, targetTexture, 0)
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
   }
 
   initVertexBuffer(v: number[]) {
@@ -170,6 +176,19 @@ export class WebGLQuad {
     gl.useProgram(null)
   }
 
+  drawGpu() {
+    let gl = <WebGLRenderingContext>this.gl
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+    let program = <WebGLProgram>this.shaderGPU.program
+    gl.useProgram(program)
+    gl.bindTexture(gl.TEXTURE_2D, this.tex)
+    gl.uniform1i(gl.getUniformLocation(program, 'texture'), 0)
+    gl.uniform2f(gl.getUniformLocation(program, 'resolution'), this.canvas.width, this.canvas.height)
+    this.drawQuad(program)
+    gl.useProgram(null)
+  }
+
   loadPixels(data: Uint8ClampedArray | Uint8Array, width: number, height: number) {
     let gl = <WebGLRenderingContext>this.gl
     if (!this.tex) {
@@ -187,8 +206,3 @@ export class WebGLQuad {
   }
 }
 
-// draw to framebuffer
-// draw to render view
-// y rows
-// each framebuffer iteration read back
-// get pixel row
