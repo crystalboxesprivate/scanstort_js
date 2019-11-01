@@ -1,3 +1,14 @@
+/** Callbacks with global UMD-name of material-ui imports */
+function externalMaterialUI (_, module, callback) {
+    var isMaterialUIComponent = /^@material-ui\/core\/([^/]+)$/;
+    var match = isMaterialUIComponent.exec(module);
+    if (match !== null) {
+        var component = match[1];
+        return callback(null, `window["material-ui"].${component}`);
+    }
+    callback();
+}
+
 module.exports = {
   mode: "production",
   devtool: "source-map",
@@ -24,6 +35,7 @@ module.exports = {
   },
   externals: {
       "react": "React",
-      "react-dom": "ReactDOM"
+      "react-dom": "ReactDOM",
+      "@material-ui/core": externalMaterialUI
   }
 }

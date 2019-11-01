@@ -1,5 +1,6 @@
 import * as React from "react"
 import {ICanvas} from '../ICanvas'
+import {Button} from '@material-ui/core'
 
 export interface ResolutionFormProps { canvas: ICanvas }
 
@@ -39,6 +40,9 @@ export class ResolutionForm extends React.Component<ResolutionFormProps, {}>  {
   render() {
     return (
       <div style={{padding: 10}}>
+        <Button variant="contained" color="primary">
+      Hello World
+    </Button>
         <span>Width: </span>
         <input type="text" value={this.state.width} name="canvas-width" onChange={this.handleChange} />
 
