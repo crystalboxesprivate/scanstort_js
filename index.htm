@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <div id='render'></div>
-<script id="drawImage-vertex-shader" type="x-shader/x-vertex">
+<script id="vert" type="x-shader/x-vertex">
    precision mediump float;
    attribute vec3 pos;
    uniform vec2 resolution;
@@ -10,26 +10,7 @@
      uv = vec2(pos.x, 1.0 - pos.y);
    }
   </script>
-  <script id="drawImage-fragment-shader" type="x-shader/x-fragment">
-   precision mediump float;
-   varying vec2 uv;
-   uniform sampler2D texture;
-   uniform float time;
-
-   void main(void) {
-      gl_FragColor = texture2D(texture, uv + vec2(cos(time* 0.05) * 0.014, sin(time * 0.25) * 0.05)).yxzw; 
-   }
-   </script>
-  <script id="drawImage-fragfbo-shader" type="x-shader/x-fragment">
-   precision mediump float;
-   varying vec2 uv;
-   uniform sampler2D texture;
-
-   void main(void) {
-      gl_FragColor = texture2D(texture, vec2(uv.x, 1.0 - uv.y)); 
-   }
-   </script>
-   <script id="drawImage-fragGPU-shader" type="x-shader/x-fragment">
+   <script id="frag" type="x-shader/x-fragment">
       precision mediump float;
       varying vec2 uv;
       uniform sampler2D texture;

@@ -48,13 +48,7 @@ export class WebGLQuad {
   bufferSize: number = 6
 
   tex: WebGLTexture | null = null
-  framebufferTex: WebGLTexture | null = null
-
-  shaderFramebuffer: ShaderProgram
-  shaderMain: ShaderProgram
-  shaderGPU: ShaderProgram
-
-  fb: WebGLFramebuffer | null = null
+  shader: ShaderProgram
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas
@@ -63,19 +57,10 @@ export class WebGLQuad {
       throw ('WebGL is not supported on your browser')
     }
 
-    this.shaderFramebuffer = new ShaderProgram(this.gl,
-      (<HTMLElement>document.getElementById('drawImage-vertex-shader')).innerText,
-      (<HTMLElement>document.getElementById('drawImage-fragment-shader')).innerText)
+    this.shader = new ShaderProgram(this.gl,
+      (<HTMLElement>document.getElementById('vert')).innerText,
+      (<HTMLElement>document.getElementById('frag')).innerText)
 
-    this.shaderMain = new ShaderProgram(this.gl,
-      (<HTMLElement>document.getElementById('drawImage-vertex-shader')).innerText,
-      (<HTMLElement>document.getElementById('drawImage-fragfbo-shader')).innerText)
-    
-    this.shaderGPU = new ShaderProgram(this.gl,
-      (<HTMLElement>document.getElementById('drawImage-vertex-shader')).innerText,
-      (<HTMLElement>document.getElementById('drawImage-fragGPU-shader')).innerText)
-
-    this.initFramebuffer()
     this.initVertexBuffer([
       0, 0,
       0, 1,
@@ -86,69 +71,12 @@ export class WebGLQuad {
     ])
   }
 
-  initFramebuffer() {
-    let gl = <WebGLRenderingContext>this.gl
-    this.framebufferTex = gl.createTexture()
-    let targetTexture = this.framebufferTex
-    gl.bindTexture(gl.TEXTURE_2D, targetTexture)
-    {
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-        this.canvas.width, this.canvas.height, 0,
-        gl.RGBA, gl.UNSIGNED_BYTE, null)
-
-      // set the filtering so we don't need mips
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-    }
-
-    this.fb = gl.createFramebuffer()
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb)
-
-    // attach the texture as the first color attachment
-    const attachmentPoint = gl.COLOR_ATTACHMENT0
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, targetTexture, 0)
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-  }
 
   initVertexBuffer(v: number[]) {
     let gl = <WebGLRenderingContext>this.gl
     this.vertexBuffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW)
-  }
-
-  getTimeFromIteration(iteration: number): number {
-    return iteration
-  }
-
-  scan(iteration: number): Uint8Array {
-    let time = this.getTimeFromIteration(iteration)
-
-    let gl = <WebGLRenderingContext>this.gl
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-
-    // render to our targetTexture by binding the framebuffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb)
-
-    let program = <WebGLProgram>this.shaderFramebuffer.program
-    gl.useProgram(program)
-    gl.bindTexture(gl.TEXTURE_2D, this.tex)
-    gl.uniform1i(gl.getUniformLocation(program, 'texture'), 0)
-    gl.uniform1f(gl.getUniformLocation(program, 'time'), time)
-
-    gl.uniform2f(gl.getUniformLocation(program, 'resolution'),
-      gl.canvas.width, gl.canvas.height)
-
-    this.drawQuad(program)
-    var pixels = new Uint8Array(gl.drawingBufferWidth * 4);
-    gl.readPixels(0, iteration, gl.drawingBufferWidth, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-    gl.useProgram(null)
-
-    return pixels
   }
 
   drawQuad(program: WebGLProgram) {
@@ -165,22 +93,10 @@ export class WebGLQuad {
 
   draw() {
     let gl = <WebGLRenderingContext>this.gl
+    gl.viewport(0, 0, this.canvas.width, this.canvas.height)
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-    let program = <WebGLProgram>this.shaderMain.program
-    gl.useProgram(program)
-    gl.bindTexture(gl.TEXTURE_2D, this.tex)
-    gl.uniform1i(gl.getUniformLocation(program, 'texture'), 0)
-    this.drawQuad(program)
-
-    gl.useProgram(null)
-  }
-
-  drawGpu() {
-    let gl = <WebGLRenderingContext>this.gl
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-    let program = <WebGLProgram>this.shaderGPU.program
+    let program = <WebGLProgram>this.shader.program
     gl.useProgram(program)
     gl.bindTexture(gl.TEXTURE_2D, this.tex)
     gl.uniform1i(gl.getUniformLocation(program, 'texture'), 0)
@@ -189,9 +105,17 @@ export class WebGLQuad {
     gl.useProgram(null)
   }
 
+  freeTexture() {
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.tex)
+    this.gl.deleteTexture(this.tex)
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null)
+    this.tex = null
+  }
+
   loadPixels(data: Uint8ClampedArray | Uint8Array, width: number, height: number) {
     let gl = <WebGLRenderingContext>this.gl
     if (!this.tex) {
+      console.log('Allocating texture... ' + width + " : " + height)
       this.tex = gl.createTexture()
       gl.bindTexture(gl.TEXTURE_2D, this.tex)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
@@ -205,4 +129,3 @@ export class WebGLQuad {
     })())
   }
 }
-

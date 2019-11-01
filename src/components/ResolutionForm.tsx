@@ -17,17 +17,23 @@ export class ResolutionForm extends React.Component<ResolutionFormProps, {}>  {
   }
 
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    let val = Math.max(+event.target.value, 1)
+    let width = this.state.width
+    let height = this.state.height
+
     if (event.target.name == "canvas-width") {
-      if (+event.target.value != this.state.width) {
-        this.state.width = +event.target.value
+      if (val != this.state.width) {
+        width = val
       }
     }
     if (event.target.name == "canvas-height") {
-      if (+event.target.value != this.state.height) {
-        this.state.height = +event.target.value
+      if (val != this.state.height) {
+        height = val
       }
     }
-    this.state.canvas.onResolutionChanged(this.state.width, this.state.height)
+
+    this.state.canvas.onResolutionChanged(width, height)
+    this.setState({width: width, height: height, canvas: this.state.canvas})
   }
 
   render() {
