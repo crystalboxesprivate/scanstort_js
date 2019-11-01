@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<canvas id="canvas2d" width="320" height="240"></canvas>
-<canvas id="canvasgl" width="320" height="240"></canvas>
+<div id='render'></div>
 <script id="drawImage-vertex-shader" type="x-shader/x-vertex">
    precision mediump float;
    attribute vec3 pos;
@@ -31,4 +30,7 @@
    }
    </script>
 
-<script type="text/javascript" src="lib/require.js" data-main="src/main.js"></script>
+
+<script src="./node_modules/react/umd/react.development.js"></script>
+<script src="./node_modules/react-dom/umd/react-dom.development.js"></script>
+<script src="./dist/main.js"></script>
