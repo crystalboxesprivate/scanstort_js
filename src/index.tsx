@@ -12,10 +12,14 @@ let controller = new ScannerController(initialWidth,
   initialHeight)
 
 ReactDOM.render(
-  <div>
-    <ResolutionSettings canvas={controller} />
-    <ScanDistortParameters obj={controller} />
-    <CanvasScan width={"" + initialWidth} height={"" + initialHeight} />
+  <div className="row">
+    <div className="params column">
+      <ResolutionSettings canvas={controller} />
+      <ScanDistortParameters obj={controller} />
+    </div>
+    <div className="column">
+      <CanvasScan width={"" + initialWidth} height={"" + initialHeight} />
+    </div>
   </div>,
   document.getElementById('render')
 );

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ICurve } from "../interfaces/ICurve"
+import { ICurve, CurvePoint } from "../interfaces/ICurve"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable"
 
 export interface CurveEditorProps { width: number; height: number; param: string; curve: ICurve; callbackObject: IValueUpdatable }
@@ -75,8 +75,8 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
   }
 
   get path(): JSX.Element[] {
-    let cx = (norm: number) => norm * +this.props.width
-    let cy = (norm: number) => norm * +this.props.height
+    const cx = (norm: number) => norm * +this.props.width
+    const cy = (norm: number) => norm * +this.props.height
 
     const items: JSX.Element[] = []
     let pts = this.props.curve.getCurvePoints()
@@ -116,17 +116,30 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
     }
 
     pts = this.props.curve.getCurvePointsUnsorted()
-    const size = 8
+    const curvePointToRect = (a: CurvePoint, s: number) => {
+      return {
+        x: cx(a.position) - s / 2,
+        y: cy(a.value) - s / 2,
+        s: s
+      }
+    }
+    const size = 10
+    const col = "rgb(12, 12, 12)"
+    const bgColor = "rgba(255, 255, 255, 0)"
+
     for (let x = 0; x < pts.length; x++) {
-      items.push(<rect key={x} name={"p" + x}
-        x={cx(pts[x].position) - size / 2}
-        y={cy(pts[x].value) - size / 2}
-        width={size}
-        height={size}
-        fill="rgb(12, 12, 12)"
+      let rL = curvePointToRect(pts[x], size)
+      let rS = curvePointToRect(pts[x], size / 2.5)
+      items.push(<rect key={`p${x}`} name={`p${x}`}
+        x={rL.x} y={rL.y} width={rL.s} height={rL.s}
+        fill={bgColor}
         onMouseDown={() => this.handleMouseDown(null, false, x)}
         onContextMenu={(ev) => this.handleMouseDown(ev, true, x)}
-        style={{ cursor: '-webkit-grab' }}
+      />, <rect key={`p${x}`} name={`p2${x}`}
+        x={rS.x} y={rS.y} width={rS.s} height={rS.s}
+        fill={col}
+        onMouseDown={() => this.handleMouseDown(null, false, x)}
+        onContextMenu={(ev) => this.handleMouseDown(ev, true, x)}
       />)
     }
     return items

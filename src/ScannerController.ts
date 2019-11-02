@@ -7,15 +7,17 @@ import { ICurve, isCurveInstance } from './interfaces/ICurve';
 
 
 export class Parameters {
-  sh_weight: number = 1
-  sh_amp: number = 1
+  sh_weight: number = 0
+  sh_amp: number = 0.004
   sh_freq: number = 0.05
+
   sh_weightCurveSlot: number = 0
   sh_freqCurveSlot: number = 0
 
   sv_weight: number = 1
-  sv_amp: number = 1
-  sv_freq: number = .05
+  sv_amp: number = 0.032
+  sv_freq: number = .12
+
   sv_weightCurveSlot: number = 0
   sv_freqCurveSlot: number = 0
 
@@ -25,8 +27,12 @@ export class Parameters {
   dv_weight: number = 0
   dv_weightCurveSlot: number = 0
 
-  n_weight: number = 0
+  n_weight: number = 1
   n_weightCurveSlot: number = 0
+  n_complexity: number = 0.5
+  n_freq: number = 1.0
+  n_ampx: number = .03
+  n_ampy: number = .1
 }
 
 export class ScannerController implements ICanvas, IValueUpdatable {
@@ -147,6 +153,14 @@ export class ScannerController implements ICanvas, IValueUpdatable {
 
         case "noise-weight":
           un.n_weight = val; break;
+        case "noise-compl":
+          un.n_complexity = val; break;
+        case "noise-freq":
+          un.n_freq = val; break;
+        case "noise-ampx":
+          un.n_ampx = val; break;
+        case "noise-ampy":
+          un.n_ampy = val; break;
 
         default: break;
       }
@@ -178,6 +192,14 @@ export class ScannerController implements ICanvas, IValueUpdatable {
 
       case "noise-weight":
         return un.n_weight
+      case "noise-compl":
+        return un.n_complexity
+      case "noise-freq":
+        return un.n_freq
+      case "noise-ampx":
+        return un.n_ampx
+      case "noise-ampy":
+        return un.n_ampy
 
       default: break;
     }

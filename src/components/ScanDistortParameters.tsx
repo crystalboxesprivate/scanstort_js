@@ -24,15 +24,17 @@ abstract class DistortParameterGroup extends React.Component<GroupProps, {}> {
     this.title = props.title
     this.obj = props.obj
   }
+  getWeightMin() { return 0 }
+  getWeightMax() { return 1 }
   getElem(): JSX.Element[] {
     let weightParamName = `${this.name}-weight`
     let curveWeightParam = `${this.name}-curve-weight`
     return [
       <RangedSlider key={weightParamName}
         title="Weight"
-        min={0} max={1}
+        min={this.getWeightMin()} max={this.getWeightMax()}
         default={this.obj.getValue(weightParamName)}
-        step={0.04}
+        step={0.004}
         parameterName={weightParamName}
         callbackObject={this.obj} />,
       <CurveEditor key={curveWeightParam}
@@ -62,7 +64,7 @@ class SineDistort extends DistortParameterGroup {
       <RangedSlider
         key={ampParamName}
         title="Amplitude"
-        min={0} max={1}
+        min={0} max={.1}
         default={this.obj.getValue(ampParamName)}
         step={0.004}
         parameterName={ampParamName}
@@ -70,7 +72,7 @@ class SineDistort extends DistortParameterGroup {
       <RangedSlider
         key={freqParamName}
         title="Frequency"
-        min={0} max={.6}
+        min={0} max={.4}
         default={this.obj.getValue(freqParamName)}
         step={0.004}
         parameterName={freqParamName}
@@ -86,9 +88,52 @@ class SineDistort extends DistortParameterGroup {
 }
 
 class DirectionalDistort extends DistortParameterGroup {
+  getWeightMin() { return -1 }
 }
 
 class NoiseDistort extends DistortParameterGroup {
+  getElem(): JSX.Element[] {
+    let complexityName = `${this.name}-compl`
+    let freqParamName = `${this.name}-freq`
+    let ampNameX = `${this.name}-ampx`
+    let ampNameY = `${this.name}-ampy`
+    let elems = super.getElem()
+    elems.push(
+      <RangedSlider
+        key={complexityName}
+        title="Complexity"
+        min={0} max={1}
+        default={this.obj.getValue(complexityName)}
+        step={0.004}
+        parameterName={complexityName}
+        callbackObject={this.obj} />,
+      <RangedSlider
+        key={freqParamName}
+        title="Frequency"
+        min={0} max={.4}
+        default={this.obj.getValue(freqParamName)}
+        step={0.004}
+        parameterName={freqParamName}
+        callbackObject={this.obj} />,
+      <RangedSlider
+        key={ampNameX}
+        title="Amp X"
+        min={0} max={.4}
+        default={this.obj.getValue(ampNameX)}
+        step={0.004}
+        parameterName={ampNameX}
+        callbackObject={this.obj} />,
+      <RangedSlider
+        key={ampNameY}
+        title="Amp Y"
+        min={0} max={2.0}
+        default={this.obj.getValue(ampNameY)}
+        step={0.004}
+        parameterName={ampNameY}
+        callbackObject={this.obj} />
+    )
+    return elems
+  }
 }
 
 interface ScanDistortParametersProps {

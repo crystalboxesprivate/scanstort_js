@@ -167,6 +167,10 @@ class UniformParameters {
 
     uniform1f("n_weight", params.n_weight)
     uniform1f("n_weightCurveSlot", params.n_weightCurveSlot)
+    uniform1f("n_complexity", params.n_complexity)
+    uniform1f("n_freq", params.n_freq)
+    gl.uniform2f(gl.getUniformLocation(program, "n_amp"), 
+      params.n_ampx, params.n_ampy)
 
     gl.uniform2f(gl.getUniformLocation(program, "curveRes"),
       CurveBufferTexture.resolution, CurveBufferTexture.slots)

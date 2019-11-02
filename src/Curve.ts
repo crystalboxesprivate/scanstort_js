@@ -1,6 +1,6 @@
 import { ICurve, CurvePoint } from "./interfaces/ICurve"
 
-export const BufferSize = 256
+export const BufferSize = 512
 
 function lerp(start: number, end: number, amount: number): number {
   return (1 - amount) * start + amount * end
