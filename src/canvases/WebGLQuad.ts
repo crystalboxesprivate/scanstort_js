@@ -1,5 +1,6 @@
-import { object } from "prop-types"
-import {BufferSize as CurveBufferSize} from "../Curve"
+import { BufferSize as CurveBufferSize } from "../Curve"
+import {Parameters} from "../ScannerController"
+
 class ShaderProgram {
   gl: WebGLRenderingContext
   program: WebGLProgram
@@ -68,6 +69,7 @@ class CurveBufferTexture {
     this.gl = gl
     this.buffer = new Uint8Array(
       CurveBufferTexture.resolution * CurveBufferTexture.slots)
+    this.buffer.fill(127)
 
     this.tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.tex);
@@ -127,65 +129,48 @@ class CurveBufferTexture {
   }
 }
 
+
 class UniformParameters {
+  params: Parameters
   gl: WebGLRenderingContext
   curveBuffer: CurveBufferTexture
-  constructor(gl: WebGLRenderingContext) {
+
+  init(gl: WebGLRenderingContext) {
     this.gl = gl
     this.curveBuffer = new CurveBufferTexture(this.gl)
   }
 
-  sh_weight: number = 0
-  sh_amp: number = 0
-  sh_freq: number = 0
-  sh_weightCurveSlot: number = 0
-  sh_freqCurveSlot: number = 0
-
-  sv_weight: number = 0
-  sv_amp: number = 0
-  sv_freq: number = 0
-  sv_weightCurveSlot: number = 0
-  sv_freqCurveSlot: number = 0
-
-  dh_weight: number = 0
-  dh_weightCurveSlot: number = 0
-
-  dv_weight: number = 0
-  dv_weightCurveSlot: number = 0
-
-  n_weight: number = 0
-  n_weightCurveSlot: number = 0
-
   setParams(program: WebGLProgram) {
     let gl = this.gl
+    const params = this.params
     const uniform1f = (name: string, val: number) =>
       gl.uniform1f(gl.getUniformLocation(program, name), val)
 
-    uniform1f("sh_weight", this.sh_weight)
-    uniform1f("sh_amp", this.sh_amp)
-    uniform1f("sh_freq", this.sh_freq)
-    uniform1f("sh_weightCurveSlot", this.sh_weightCurveSlot)
-    uniform1f("sh_freqCurveSlot", this.sh_freqCurveSlot)
+    uniform1f("sh_weight", params.sh_weight)
+    uniform1f("sh_amp", params.sh_amp)
+    uniform1f("sh_freq", params.sh_freq)
+    uniform1f("sh_weightCurveSlot", params.sh_weightCurveSlot)
+    uniform1f("sh_freqCurveSlot", params.sh_freqCurveSlot)
 
-    uniform1f("sv_weight", this.sv_weight)
-    uniform1f("sv_amp", this.sv_amp)
-    uniform1f("sv_freq", this.sv_freq)
+    uniform1f("sv_weight", params.sv_weight)
+    uniform1f("sv_amp", params.sv_amp)
+    uniform1f("sv_freq", params.sv_freq)
 
-    uniform1f("sv_weightCurveSlot", this.sv_weightCurveSlot)
-    uniform1f("sv_freqCurveSlot", this.sv_freqCurveSlot)
+    uniform1f("sv_weightCurveSlot", params.sv_weightCurveSlot)
+    uniform1f("sv_freqCurveSlot", params.sv_freqCurveSlot)
 
-    uniform1f("dh_weight", this.dh_weight)
-    uniform1f("dh_weightCurveSlot", this.dh_weightCurveSlot)
+    uniform1f("dh_weight", params.dh_weight)
+    uniform1f("dh_weightCurveSlot", params.dh_weightCurveSlot)
 
-    uniform1f("dv_weight", this.dv_weight)
-    uniform1f("dv_weightCurveSlot", this.dv_weightCurveSlot)
+    uniform1f("dv_weight", params.dv_weight)
+    uniform1f("dv_weightCurveSlot", params.dv_weightCurveSlot)
 
-    uniform1f("n_weight", this.n_weight)
-    uniform1f("n_weightCurveSlot", this.n_weightCurveSlot)
+    uniform1f("n_weight", params.n_weight)
+    uniform1f("n_weightCurveSlot", params.n_weightCurveSlot)
 
-    gl.uniform2f(gl.getUniformLocation(program, "curveRes"), 
+    gl.uniform2f(gl.getUniformLocation(program, "curveRes"),
       CurveBufferTexture.resolution, CurveBufferTexture.slots)
-    
+
   }
 }
 
@@ -201,7 +186,7 @@ export class WebGLQuad {
 
   uniforms: UniformParameters
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, params: Parameters) {
     this.canvas = canvas
     this.gl = <WebGLRenderingContext>canvas.getContext('webgl')
     if (!this.gl) {
@@ -212,7 +197,9 @@ export class WebGLQuad {
       (<HTMLElement>document.getElementById('vert')).innerText,
       (<HTMLElement>document.getElementById('frag')).innerText)
 
-    this.uniforms = new UniformParameters(this.gl)
+    this.uniforms = new UniformParameters()
+    this.uniforms.params = params
+    this.uniforms.init(this.gl)
 
 
     this.initVertexBuffer([

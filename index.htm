@@ -1,11 +1,23 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style type="text/css">
+   body {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 8pt;
+   }
+
+   h1,
+   h2,
+   h3 {
+      margin: 0;
+      padding: 0;
+   }
+
    #render {
       width: 1024px;
       display: block;
       margin-left: auto;
-      margin-right: auto
+      margin-right: auto;
    }
 
    .canvases canvas {
@@ -16,7 +28,7 @@
    }
 
    .curve-editor {
-      border: 1px solid black;
+      border: 0.5px solid #aaa;
    }
 </style>
 <div id='render'></div>
@@ -79,9 +91,10 @@
    
       void main(void) {
          float time = uv.y * resolution.y;
+         gl_FragColor = texture2D(texture, uv + getOffset(time)); 
          // gl_FragColor = texture2D(texture, uv + getOffset(time)); 
          //gl_FragColor = vec4(sampleCurve(1.0, uv.x), 0, 0, 1);
-         gl_FragColor = vec4(texture2D(curves, uv).x , 0, 0, 1);
+         //gl_FragColor = vec4(texture2D(curves, uv).x , 0, 0, 1);
       }
    </script>
 

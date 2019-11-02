@@ -7,45 +7,73 @@ import { Curve } from "../Curve"
 const ceWidth = 300
 const ceHeight = 25
 
-abstract class DistortParameterGroup {
+interface GroupProps {
+  name: string,
+  title: string,
+  obj: IValueUpdatable
+}
+
+abstract class DistortParameterGroup extends React.Component<GroupProps, {}> {
   name: string
+  title: string
   obj: IValueUpdatable
 
-  constructor(name: string, obj: IValueUpdatable) {
-    this.name = name
-    this.obj = obj
+  constructor(props: GroupProps) {
+    super(props)
+    this.name = props.name
+    this.title = props.title
+    this.obj = props.obj
   }
   getElem(): JSX.Element[] {
+    let weightParamName = `${this.name}-weight`
+    let curveWeightParam = `${this.name}-curve-weight`
     return [
-      <RangedSlider key={this.name + "-weight"}
+      <RangedSlider key={weightParamName}
         title="Weight"
-        min={0} max={1} default={0} step={0.04}
-        parameterName={this.name + "-weight"}
+        min={0} max={1}
+        default={this.obj.getValue(weightParamName)}
+        step={0.04}
+        parameterName={weightParamName}
         callbackObject={this.obj} />,
-      <CurveEditor key={this.name + "-curve-weight"}
+      <CurveEditor key={curveWeightParam}
         curve={new Curve()}
         width={ceWidth} height={ceHeight}
-        param={this.name + "-curve-weight"}
+        param={curveWeightParam}
         callbackObject={this.obj} />
     ]
+  }
+
+  render() {
+    return (
+      <div className="parameter-group">
+        <h3 className="title">{this.title}</h3>
+        {this.getElem()}
+      </div>
+    )
   }
 }
 
 class SineDistort extends DistortParameterGroup {
   getElem(): JSX.Element[] {
+    let ampParamName = `${this.name}-amp`
+    let freqParamName = `${this.name}-frequency`
     let elems = super.getElem()
     elems.push(
       <RangedSlider
-        key={this.name + "-amp"}
+        key={ampParamName}
         title="Amplitude"
-        min={0} max={1} default={1} step={0.04}
-        parameterName={this.name + "-amp"}
+        min={0} max={1}
+        default={this.obj.getValue(ampParamName)}
+        step={0.004}
+        parameterName={ampParamName}
         callbackObject={this.obj} />,
       <RangedSlider
-        key={this.name + "-frequency"}
+        key={freqParamName}
         title="Frequency"
-        min={0} max={.6} default={0.05} step={0.004}
-        parameterName={this.name + "-frequency"}
+        min={0} max={.6}
+        default={this.obj.getValue(freqParamName)}
+        step={0.004}
+        parameterName={freqParamName}
         callbackObject={this.obj} />,
       <CurveEditor key={this.name + "-frequency-curve"}
         curve={new Curve()}
@@ -62,9 +90,11 @@ class DirectionalDistort extends DistortParameterGroup {
 
 class NoiseDistort extends DistortParameterGroup {
 }
-export interface ScanDistortParametersProps {
+
+interface ScanDistortParametersProps {
   obj: IValueUpdatable
 }
+
 export class ScanDistortParameters extends React.Component<ScanDistortParametersProps, {}> {
   sineHorizontal: SineDistort
   sineVertical: SineDistort
@@ -77,37 +107,16 @@ export class ScanDistortParameters extends React.Component<ScanDistortParameters
   constructor(props: ScanDistortParametersProps) {
     super(props)
     this.obj = props.obj
-
-    this.sineHorizontal = new SineDistort("sineHorizontal", this.obj)
-    this.sineVertical = new SineDistort("sineVertical", this.obj)
-    this.dirHorizontal = new DirectionalDistort("dirHorizontal", this.obj)
-    this.dirVertical = new DirectionalDistort("dirVertical", this.obj)
-    this.noise = new NoiseDistort("noise", this.obj)
   }
 
   render() {
     return (
       <div className="distort-parameters">
-        <div>
-          <h3>Sine Horizontal</h3>
-          {this.sineHorizontal.getElem()}
-        </div>
-        <div>
-          <h3>Sine Vertical</h3>
-          {this.sineVertical.getElem()}
-        </div>
-        <div>
-          <h3>Direction Horizontal</h3>
-          {this.dirHorizontal.getElem()}
-        </div>
-        <div>
-          <h3>Direction Vertical</h3>
-          {this.dirVertical.getElem()}
-        </div>
-        <div>
-          <h3>Noise</h3>
-          {this.noise.getElem()}
-        </div>
+        <SineDistort ref={node => (this.sineHorizontal = node)} name="sineHorizontal" title="Sine Horizontal" obj={this.obj} />
+        <SineDistort ref={node => (this.sineVertical = node)} name="sineVertical" title="Sine Vertical" obj={this.obj} />
+        <DirectionalDistort ref={node => (this.dirHorizontal = node)} name="dirHorizontal" title="Direction Horizontal" obj={this.obj} />
+        <DirectionalDistort ref={node => (this.dirVertical = node)} name="dirVertical" title="Direction Vertical" obj={this.obj} />
+        <NoiseDistort ref={node => (this.noise = node)} name="noise" title="Noise" obj={this.obj} />
       </div>
     )
   }

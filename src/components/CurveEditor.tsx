@@ -27,7 +27,7 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
   }
 
   handleMouseDown(ev: React.MouseEvent<SVGElement, MouseEvent>, isRight: boolean, pointId: number) {
-    if (isRight) {
+    if (isRight && pointId !== null) {
       this.props.curve.removePoint(pointId)
       this.updateState(null)
       ev.preventDefault()
