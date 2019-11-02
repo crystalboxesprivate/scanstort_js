@@ -11,6 +11,8 @@ export class Parameters {
   repeats: number = 10
 
   g_amount:number = 1.0
+  g_amountX:number = 1.0
+  g_amountY:number = 0.999
 
   // curves
   sh_weightCurve = new Curve()
@@ -30,8 +32,8 @@ export class Parameters {
   sh_freqCurveSlot: number = 0
 
   sv_weight: number = 1
-  sv_amp: number = 0.032
-  sv_freq: number = .12
+  sv_amp: number = 0.036
+  sv_freq: number = .036
 
   sv_weightCurveSlot: number = 0
   sv_freqCurveSlot: number = 0
@@ -39,7 +41,7 @@ export class Parameters {
   dh_weight: number = 0
   dh_weightCurveSlot: number = 0
 
-  dv_weight: number = 0
+  dv_weight: number = .552
   dv_weightCurveSlot: number = 0
 
   n_weight: number = 1

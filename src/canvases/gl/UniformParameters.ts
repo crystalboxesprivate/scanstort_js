@@ -17,7 +17,8 @@ export class UniformParameters {
     const uniform1f = (name: string, val: number) =>
       gl.uniform1f(gl.getUniformLocation(program, name), val)
 
-    uniform1f("g_amount", params.g_amount)
+      gl.uniform3f(gl.getUniformLocation(program, "g_amount"),
+        params.g_amountX, params.g_amountY, params.g_amount)
     
     uniform1f("sh_weight", params.sh_weight)
     uniform1f("sh_amp", params.sh_amp)

@@ -28,8 +28,8 @@ export class ScannerController implements IValueUpdatable {
   }
 
   updateResolution(): void {
-    this.canvasGl.width = this.canvas2d.width = this.params.width 
-    this.canvasGl.height = this.canvas2d.height = this.params.height 
+    this.canvasGl.width = this.canvas2d.width = this.params.width
+    this.canvasGl.height = this.canvas2d.height = this.params.height
     this.canvasGl.freeTexture()
     this.setDirty()
   }
@@ -110,11 +110,15 @@ export class ScannerController implements IValueUpdatable {
           un.repeats = value; break;
 
         case "width":
-          {un.width = value; this.updateResolution(); break;}
+          { un.width = value; this.updateResolution(); break; }
         case "height":
-          {un.height = value; this.updateResolution(); break;}
+          { un.height = value; this.updateResolution(); break; }
         case "g_amount":
           un.g_amount = value; break;
+        case "g_amountX":
+          un.g_amountX = value; break;
+        case "g_amountY":
+          un.g_amountY = value; break;
 
         case "sineHorizontal-weight":
           un.sh_weight = value; break;
@@ -172,6 +176,10 @@ export class ScannerController implements IValueUpdatable {
         return un.height
       case "g_amount":
         return un.g_amount
+      case "g_amountX":
+        return un.g_amountX
+      case "g_amountY":
+        return un.g_amountY
 
       case "sineHorizontal-curve-weight":
         return un.sh_weightCurve

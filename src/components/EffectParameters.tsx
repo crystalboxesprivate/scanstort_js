@@ -2,7 +2,6 @@ import { RangedSlider } from "./core/RangedSlider"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable"
 import * as React from "react"
 import { CurveEditor } from "./core/CurveEditor"
-import { Curve } from "../Curve"
 
 const ceWidth = 300
 const ceHeight = 25
@@ -103,21 +102,21 @@ class NoiseDistort extends DistortParameterGroup {
     let elems = super.getElem()
     elems.push(
       <RangedSlider
-      key={ampNameX}
-      title="Amp X"
-      min={0} max={.4}
-      default={this.obj.getValue(ampNameX)}
-      step={0.004}
-      parameterName={ampNameX}
-      callbackObject={this.obj} />,
-    <RangedSlider
-      key={ampNameY}
-      title="Amp Y"
-      min={0} max={2.0}
-      default={this.obj.getValue(ampNameY)}
-      step={0.004}
-      parameterName={ampNameY}
-      callbackObject={this.obj} />,
+        key={ampNameX}
+        title="Amp X"
+        min={0} max={.4}
+        default={this.obj.getValue(ampNameX)}
+        step={0.004}
+        parameterName={ampNameX}
+        callbackObject={this.obj} />,
+      <RangedSlider
+        key={ampNameY}
+        title="Amp Y"
+        min={0} max={2.0}
+        default={this.obj.getValue(ampNameY)}
+        step={0.004}
+        parameterName={ampNameY}
+        callbackObject={this.obj} />,
       <RangedSlider
         key={complexityName}
         title="Complexity"
@@ -174,6 +173,20 @@ export class EffectParameters extends React.Component<EffectParametersProps, {}>
           default={this.obj.getValue('g_amount')}
           step={0.004}
           parameterName={'g_amount'}
+          callbackObject={this.obj} />
+        <RangedSlider
+          title="Amount X"
+          min={0.8} max={1.0}
+          default={this.obj.getValue('g_amountX')}
+          step={0.001}
+          parameterName={'g_amountX'}
+          callbackObject={this.obj} />
+        <RangedSlider
+          title="Amount Y"
+          min={0.8} max={1.0}
+          default={this.obj.getValue('g_amountY')}
+          step={0.001}
+          parameterName={'g_amountY'}
           callbackObject={this.obj} />
 
         <SineDistort ref={node => (this.sineVertical = node)}

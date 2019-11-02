@@ -3,6 +3,50 @@ import { UniformParameters } from "./UniformParameters"
 import { Parameters } from "../../Parameters"
 import { CanvasBase, aspect } from "../CanvasBase"
 
+class Framebuffer {
+  fb: WebGLFramebuffer
+  framebufferTex: WebGLTexture
+  gl: WebGLRenderingContext
+  canvas:CanvasBase
+  resolutionMultiplier: number
+
+  constructor(gl: WebGLRenderingContext, resolutionMultiplier:number, canvas: CanvasBase) {
+    this.gl = gl
+    this.canvas = canvas
+    this.resolutionMultiplier = resolutionMultiplier
+    this.fb = gl.createFramebuffer()
+    this.reallocate()
+  }
+
+  reallocate() {
+    let gl = this.gl
+    let canvas = this.canvas
+    if (this.framebufferTex != null) {
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.framebufferTex)
+      this.gl.deleteTexture(this.framebufferTex)
+      this.gl.bindTexture(this.gl.TEXTURE_2D, null)
+    }
+    this.framebufferTex = gl.createTexture()
+    let targetTexture = this.framebufferTex
+    gl.bindTexture(gl.TEXTURE_2D, targetTexture)
+    {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+        canvas.width * this.resolutionMultiplier, canvas.height * this.resolutionMultiplier, 0,
+                    gl.RGBA, gl.UNSIGNED_BYTE, null)
+    
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    }
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb)
+    
+    const attachmentPoint = gl.COLOR_ATTACHMENT0
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, targetTexture, 0)
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+  }
+}
+
 export class WebGLQuad extends CanvasBase {
   gl: WebGLRenderingContext | null = null
 
@@ -12,6 +56,8 @@ export class WebGLQuad extends CanvasBase {
   tex: WebGLTexture | null = null
   shader: ShaderProgram
   uniforms: UniformParameters
+
+  framebuffer: Framebuffer
 
   constructor(canvasId: string, params: Parameters) {
     super(canvasId)
@@ -27,6 +73,8 @@ export class WebGLQuad extends CanvasBase {
     this.uniforms = new UniformParameters()
     this.uniforms.params = params
     this.uniforms.init(this.gl)
+
+    this.framebuffer = new Framebuffer(this.gl, 1, this)
 
     this.initVertexBuffer([
       0, 0,
@@ -87,6 +135,8 @@ export class WebGLQuad extends CanvasBase {
     this.gl.deleteTexture(this.tex)
     this.gl.bindTexture(this.gl.TEXTURE_2D, null)
     this.tex = null
+
+    this.framebuffer.reallocate()
   }
 
   loadPixels(data: Uint8ClampedArray | Uint8Array, width: number, height: number) {

@@ -6,9 +6,16 @@ import { ScannerController } from './Controller'
 import { EffectParameters } from './components/EffectParameters';
 import { TextInputParameters } from './components/TextInputParameters';
 import { Parameters } from './Parameters';
+import { packState, unpackState } from './State';
 
 let parameters = new Parameters()
 let controller = new ScannerController(parameters)
+
+function printState(e: React.MouseEvent) {
+  let packed = packState(parameters)
+  console.log(packed)
+  console.log(unpackState(packed))
+}
 
 ReactDOM.render(
   <div className="row">
@@ -16,6 +23,9 @@ ReactDOM.render(
       <TextInputParameters callbackObj={controller} />
       <ResolutionSettings canvas={controller} />
       <EffectParameters obj={controller} />
+      <button onClick={printState}>
+        Output state
+      </button>
     </div>
     <div className="column">
       <div className='canvases'>
