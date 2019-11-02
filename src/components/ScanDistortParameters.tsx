@@ -26,6 +26,7 @@ abstract class DistortParameterGroup extends React.Component<GroupProps, {}> {
   }
   getWeightMin() { return 0 }
   getWeightMax() { return 1 }
+
   getElem(): JSX.Element[] {
     let weightParamName = `${this.name}-weight`
     let curveWeightParam = `${this.name}-curve-weight`
@@ -38,7 +39,7 @@ abstract class DistortParameterGroup extends React.Component<GroupProps, {}> {
         parameterName={weightParamName}
         callbackObject={this.obj} />,
       <CurveEditor key={curveWeightParam}
-        curve={new Curve()}
+        curve={this.obj.getValue(curveWeightParam)}
         width={ceWidth} height={ceHeight}
         param={curveWeightParam}
         callbackObject={this.obj} />
@@ -59,6 +60,7 @@ class SineDistort extends DistortParameterGroup {
   getElem(): JSX.Element[] {
     let ampParamName = `${this.name}-amp`
     let freqParamName = `${this.name}-frequency`
+    let freqCurveParamName = `${this.name}-frequency-curve`
     let elems = super.getElem()
     elems.push(
       <RangedSlider
@@ -77,10 +79,10 @@ class SineDistort extends DistortParameterGroup {
         step={0.004}
         parameterName={freqParamName}
         callbackObject={this.obj} />,
-      <CurveEditor key={this.name + "-frequency-curve"}
-        curve={new Curve()}
+      <CurveEditor key={freqCurveParamName}
+        curve={this.obj.getValue(freqCurveParamName)}
         width={ceWidth} height={ceHeight}
-        param={this.name + "-frequency-curve"}
+        param={freqCurveParamName}
         callbackObject={this.obj} />
     )
     return elems

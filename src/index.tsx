@@ -5,6 +5,7 @@ import { CanvasScan } from './components/CanvasScan'
 import { ResolutionSettings } from './components/ResolutionSettings'
 import { ScannerController } from './ScannerController'
 import { ScanDistortParameters } from './components/ScanDistortParameters';
+import { TextInputParameters } from './components/TextInputParameters';
 
 let initialWidth = 640
 let initialHeight = 480
@@ -14,6 +15,7 @@ let controller = new ScannerController(initialWidth,
 ReactDOM.render(
   <div className="row">
     <div className="params column">
+      <TextInputParameters callbackObj={controller} />
       <ResolutionSettings canvas={controller} />
       <ScanDistortParameters obj={controller} />
     </div>
@@ -24,5 +26,5 @@ ReactDOM.render(
   document.getElementById('render')
 );
 
-controller.init()
+controller.initGraphics()
 controller.drawLoop()

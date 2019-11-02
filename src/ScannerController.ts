@@ -2,38 +2,11 @@ import { ICanvas } from './interfaces/ICanvas'
 
 import { WebGLQuad } from "./canvases/WebGLQuad";
 import { Canvas2D } from "./canvases/Canvas2D"
+import { Parameters } from "./Parameters"
 import { IValueUpdatable } from './interfaces/IValueUpdatable';
 import { ICurve, isCurveInstance } from './interfaces/ICurve';
 
 
-export class Parameters {
-  sh_weight: number = 0
-  sh_amp: number = 0.004
-  sh_freq: number = 0.05
-
-  sh_weightCurveSlot: number = 0
-  sh_freqCurveSlot: number = 0
-
-  sv_weight: number = 1
-  sv_amp: number = 0.032
-  sv_freq: number = .12
-
-  sv_weightCurveSlot: number = 0
-  sv_freqCurveSlot: number = 0
-
-  dh_weight: number = 0
-  dh_weightCurveSlot: number = 0
-
-  dv_weight: number = 0
-  dv_weightCurveSlot: number = 0
-
-  n_weight: number = 1
-  n_weightCurveSlot: number = 0
-  n_complexity: number = 0.5
-  n_freq: number = 1.0
-  n_ampx: number = .03
-  n_ampy: number = .1
-}
 
 export class ScannerController implements ICanvas, IValueUpdatable {
   params: Parameters
@@ -64,16 +37,13 @@ export class ScannerController implements ICanvas, IValueUpdatable {
       this.canvasGl.canvas.width = this.canvas2d.canvas.width = this.res.width = width
       this.canvasGl.canvas.height = this.canvas2d.canvas.height = this.res.height = height
       this.canvasGl.freeTexture()
-      this.handleCanvas2dDrawing()
     }
-    this.handleGlDrawing()
-  }
-
-  handleCanvas2dDrawing() {
-    this.canvas2d.drawText("download")
+    this.setDirty()
   }
 
   handleGlDrawing() {
+    this.canvas2d.drawText(this.params.text, this.params.size, this.params.font, this.params.repeats)
+
     let canvasGl = this.canvasGl
     let canvas2d = this.canvas2d
     let width = this.res.width
@@ -85,18 +55,17 @@ export class ScannerController implements ICanvas, IValueUpdatable {
     this.isDirty = false
   }
 
-  init() {
+  initGraphics() {
     this.canvasGl = new WebGLQuad(document.getElementById('canvasgl') as HTMLCanvasElement, this.params)
     this.canvas2d = new Canvas2D(document.getElementById('canvas2d') as HTMLCanvasElement)
     this.canvas2d.canvas.style.display = "none"
     this.canvasGl.canvas.style.display = "block"
-    this.handleCanvas2dDrawing()
-    this.handleGlDrawing()
+    this.setDirty()
   }
 
   drawLoop() {
     let that = this
-    function update(timestamp: number) {
+    function update(_: number) {
       if (that.isDirty) {
         that.handleGlDrawing()
       }
@@ -107,6 +76,7 @@ export class ScannerController implements ICanvas, IValueUpdatable {
   }
 
   setValue(name: string, value: any): void {
+
     let uniforms = this.canvasGl.uniforms
     let un = this.params
     if (isCurveInstance(value)) {
@@ -130,37 +100,45 @@ export class ScannerController implements ICanvas, IValueUpdatable {
         default: break;
       }
     } else {
-      let val = <number>value
       switch (name) {
+        case "text-textarea":
+          un.text = value; break;
+        case "text-font":
+          un.font = value; break;
+        case "text-size":
+          un.size = value; break;
+        case "text-repeats":
+          un.repeats = value; break;
+
         case "sineHorizontal-weight":
-          un.sh_weight = val; break;
+          un.sh_weight = value; break;
         case "sineHorizontal-amp":
-          un.sh_amp = val; break;
+          un.sh_amp = value; break;
         case "sineHorizontal-frequency":
-          un.sh_freq = val; break;
+          un.sh_freq = value; break;
 
         case "sineVertical-weight":
-          un.sv_weight = val; break;
+          un.sv_weight = value; break;
         case "sineVertical-amp":
-          un.sv_amp = val; break;
+          un.sv_amp = value; break;
         case "sineVertical-frequency":
-          un.sv_freq = val; break;
+          un.sv_freq = value; break;
 
         case "dirHorizontal-weight":
-          un.dh_weight = val; break;
+          un.dh_weight = value; break;
         case "dirVertical-weight":
-          un.dv_weight = val; break;
+          un.dv_weight = value; break;
 
         case "noise-weight":
-          un.n_weight = val; break;
+          un.n_weight = value; break;
         case "noise-compl":
-          un.n_complexity = val; break;
+          un.n_complexity = value; break;
         case "noise-freq":
-          un.n_freq = val; break;
+          un.n_freq = value; break;
         case "noise-ampx":
-          un.n_ampx = val; break;
+          un.n_ampx = value; break;
         case "noise-ampy":
-          un.n_ampy = val; break;
+          un.n_ampy = value; break;
 
         default: break;
       }
@@ -171,6 +149,30 @@ export class ScannerController implements ICanvas, IValueUpdatable {
   getValue(name: string): any {
     let un = this.params
     switch (name) {
+      case "text-textarea":
+        return un.text
+      case "text-font":
+        return un.font
+      case "text-size":
+        return un.size
+      case "text-repeats":
+        return un.repeats
+
+      case "sineHorizontal-curve-weight":
+        return un.sh_weightCurve
+      case "sineHorizontal-frequency-curve":
+        return un.sh_frequencyCurve
+      case "sineVertical-curve-weight":
+        return un.sv_weightCurve
+      case "sineVertical-frequency-curve":
+        return un.sv_frequencyCurve
+      case "dirHorizontal-curve-weight":
+        return un.dh_weightCurve
+      case "dirVertical-curve-weight":
+        return un.dv_weightCurve
+      case "noise-curve-weight":
+        return un.n_weightCurve
+
       case "sineHorizontal-weight":
         return un.sh_weight
       case "sineHorizontal-amp":

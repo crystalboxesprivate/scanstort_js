@@ -1,5 +1,5 @@
 import { BufferSize as CurveBufferSize } from "../Curve"
-import {Parameters} from "../ScannerController"
+import {Parameters} from "../Parameters"
 
 class ShaderProgram {
   gl: WebGLRenderingContext

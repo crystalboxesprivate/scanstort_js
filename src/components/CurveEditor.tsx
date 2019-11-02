@@ -130,7 +130,7 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
     for (let x = 0; x < pts.length; x++) {
       let rL = curvePointToRect(pts[x], size)
       let rS = curvePointToRect(pts[x], size / 2.5)
-      items.push(<rect key={`p${x}`} name={`p${x}`}
+      items.push(<rect key={`pl${x}`} name={`p${x}`}
         x={rL.x} y={rL.y} width={rL.s} height={rL.s}
         fill={bgColor}
         onMouseDown={() => this.handleMouseDown(null, false, x)}
