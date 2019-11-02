@@ -7,13 +7,10 @@ export function isCurveInstance(value: any): boolean {
   if (typeof value !== 'object') {
     return false
   }
-  return 'getCurvePointBuffer' in value && 'getCurvePoints' in value
+  return 'getCurvePoints' in value && 'getLastPointIndex' in value
 }
 
 export interface ICurve {
-  getCurveResolution(): number
-
-  getCurvePointBuffer(): Float32Array
   getCurvePoints(): CurvePoint[]
   getCurvePointsUnsorted(): CurvePoint[]
 

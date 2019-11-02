@@ -1,5 +1,5 @@
 import React = require("react")
-import { RangedSlider } from "./RangedSlider"
+import { RangedSlider } from "./core/RangedSlider"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable"
 
 interface TextInputProps { callbackObj: IValueUpdatable }
@@ -28,8 +28,6 @@ export class TextInputParameters extends React.Component<TextInputProps, {}> {
 
   handleChange(event: React.ChangeEvent<HTMLSelectElement | HTMLTextAreaElement>) {
     let target = event.target
-    console.log(target.tagName)
-
     let state = this.state
     if (target.tagName == 'TEXTAREA') {
       state.text = target.value

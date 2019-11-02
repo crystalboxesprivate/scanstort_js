@@ -1,43 +1,36 @@
-import { ICanvas } from './interfaces/ICanvas'
+import { WebGLQuad } from './canvases/gl/WebGLQuad'
+import { Canvas2D } from './canvases/Canvas2D'
+import { Parameters } from './Parameters'
+import { IValueUpdatable } from './interfaces/IValueUpdatable'
+import { ICurve, isCurveInstance } from './interfaces/ICurve'
 
-import { WebGLQuad } from "./canvases/WebGLQuad";
-import { Canvas2D } from "./canvases/Canvas2D"
-import { Parameters } from "./Parameters"
-import { IValueUpdatable } from './interfaces/IValueUpdatable';
-import { ICurve, isCurveInstance } from './interfaces/ICurve';
-
-
-
-export class ScannerController implements ICanvas, IValueUpdatable {
+export class ScannerController implements IValueUpdatable {
   params: Parameters
 
   canvasGl: WebGLQuad | null = null
   canvas2d: Canvas2D | null = null
-  res: { width: number, height: number }
   isDirty: boolean = true
-  constructor(width: number, height: number) {
-    this.res = { width: width, height: height }
-    this.params = new Parameters()
+
+  constructor(params: Parameters) {
+    this.params = params
   }
 
   getWidth(): number {
-    return this.res.width
+    return this.params.width
   }
 
   getHeight(): number {
-    return this.res.height
+    return this.params.height
   }
 
   setDirty(): void {
     this.isDirty = true
   }
 
-  onResolutionChanged(width: number, height: number): void {
-    if (width != this.res.width || height != this.res.height) {
-      this.canvasGl.canvas.width = this.canvas2d.canvas.width = this.res.width = width
-      this.canvasGl.canvas.height = this.canvas2d.canvas.height = this.res.height = height
-      this.canvasGl.freeTexture()
-    }
+  updateResolution(): void {
+    this.canvasGl.width = this.canvas2d.width = this.params.width 
+    this.canvasGl.height = this.canvas2d.height = this.params.height 
+    this.canvasGl.freeTexture()
     this.setDirty()
   }
 
@@ -46,18 +39,25 @@ export class ScannerController implements ICanvas, IValueUpdatable {
 
     let canvasGl = this.canvasGl
     let canvas2d = this.canvas2d
-    let width = this.res.width
-    let height = this.res.height
+    let width = this.params.width
+    let height = this.params.height
 
-    var pixel = canvas2d.ctx.getImageData(0, 0, width, height)
-    canvasGl.loadPixels(pixel.data, width, height)
+    var pixel = canvas2d.getImageData(0, 0, width, height)
+    canvasGl.loadPixels(pixel.data, pixel.width, pixel.height)
     canvasGl.draw()
     this.isDirty = false
   }
 
   initGraphics() {
-    this.canvasGl = new WebGLQuad(document.getElementById('canvasgl') as HTMLCanvasElement, this.params)
-    this.canvas2d = new Canvas2D(document.getElementById('canvas2d') as HTMLCanvasElement)
+    // set resolution
+    this.canvasGl = new WebGLQuad('canvasgl', this.params)
+    this.canvas2d = new Canvas2D('canvas2d')
+    // set styles
+    this.canvas2d.width = this.params.width
+    this.canvas2d.height = this.params.height
+    this.canvasGl.width = this.params.width
+    this.canvasGl.height = this.params.height
+
     this.canvas2d.canvas.style.display = "none"
     this.canvasGl.canvas.style.display = "block"
     this.setDirty()
@@ -76,12 +76,11 @@ export class ScannerController implements ICanvas, IValueUpdatable {
   }
 
   setValue(name: string, value: any): void {
-
     let uniforms = this.canvasGl.uniforms
     let un = this.params
     if (isCurveInstance(value)) {
       let curve = <ICurve>value;
-      let slot = uniforms.curveBuffer.setCurve(curve.getCurvePointBuffer(), name)
+      let slot = uniforms.curveBuffer.setCurve(curve, name)
       switch (name) {
         case "sineHorizontal-curve-weight":
           un.sh_weightCurveSlot = slot; break;
@@ -109,6 +108,13 @@ export class ScannerController implements ICanvas, IValueUpdatable {
           un.size = value; break;
         case "text-repeats":
           un.repeats = value; break;
+
+        case "width":
+          {un.width = value; this.updateResolution(); break;}
+        case "height":
+          {un.height = value; this.updateResolution(); break;}
+        case "g_amount":
+          un.g_amount = value; break;
 
         case "sineHorizontal-weight":
           un.sh_weight = value; break;
@@ -139,6 +145,8 @@ export class ScannerController implements ICanvas, IValueUpdatable {
           un.n_ampx = value; break;
         case "noise-ampy":
           un.n_ampy = value; break;
+        case "noise-offset":
+          un.n_offset = value; break;
 
         default: break;
       }
@@ -157,6 +165,13 @@ export class ScannerController implements ICanvas, IValueUpdatable {
         return un.size
       case "text-repeats":
         return un.repeats
+
+      case "width":
+        return un.width
+      case "height":
+        return un.height
+      case "g_amount":
+        return un.g_amount
 
       case "sineHorizontal-curve-weight":
         return un.sh_weightCurve
@@ -202,6 +217,8 @@ export class ScannerController implements ICanvas, IValueUpdatable {
         return un.n_ampx
       case "noise-ampy":
         return un.n_ampy
+      case "noise-offset":
+        return un.n_offset
 
       default: break;
     }

@@ -1,11 +1,16 @@
 import { Curve } from "./Curve"
 
 export class Parameters {
+  width: number = 640
+  height: number = 480
+  
   // Input text
   text: string = "distort"
   font: string = "Impact"
   size: number = 78
   repeats: number = 10
+
+  g_amount:number = 1.0
 
   // curves
   sh_weightCurve = new Curve()
@@ -43,4 +48,5 @@ export class Parameters {
   n_freq: number = 1.0
   n_ampx: number = .03
   n_ampy: number = .1
+  n_offset: number = 0.0
 }

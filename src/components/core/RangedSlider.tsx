@@ -1,5 +1,5 @@
 import * as React from "react"
-import { IValueUpdatable } from "../interfaces/IValueUpdatable"
+import { IValueUpdatable } from "../../interfaces/IValueUpdatable"
 
 export interface RangedSliderProps {
   min: number, max: number, default: number,

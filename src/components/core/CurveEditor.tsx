@@ -1,6 +1,6 @@
 import * as React from "react"
-import { ICurve, CurvePoint } from "../interfaces/ICurve"
-import { IValueUpdatable } from "../interfaces/IValueUpdatable"
+import { ICurve, CurvePoint } from "../../interfaces/ICurve"
+import { IValueUpdatable } from "../../interfaces/IValueUpdatable"
 
 export interface CurveEditorProps { width: number; height: number; param: string; curve: ICurve; callbackObject: IValueUpdatable }
 
@@ -38,7 +38,7 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
 
 
   handleSvgMouseDown(ev: React.MouseEvent<SVGElement, MouseEvent>) {
-    if (ev.ctrlKey) {
+    if (ev.altKey) {
 
       const svgRect = this.node.getBoundingClientRect();
       const svgX = ev.clientX - svgRect.left;

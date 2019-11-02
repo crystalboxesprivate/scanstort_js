@@ -1,26 +1,27 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { CanvasScan } from './components/CanvasScan'
 import { ResolutionSettings } from './components/ResolutionSettings'
-import { ScannerController } from './ScannerController'
-import { ScanDistortParameters } from './components/ScanDistortParameters';
+import { ScannerController } from './Controller'
+import { EffectParameters } from './components/EffectParameters';
 import { TextInputParameters } from './components/TextInputParameters';
+import { Parameters } from './Parameters';
 
-let initialWidth = 640
-let initialHeight = 480
-let controller = new ScannerController(initialWidth,
-  initialHeight)
+let parameters = new Parameters()
+let controller = new ScannerController(parameters)
 
 ReactDOM.render(
   <div className="row">
     <div className="params column">
       <TextInputParameters callbackObj={controller} />
       <ResolutionSettings canvas={controller} />
-      <ScanDistortParameters obj={controller} />
+      <EffectParameters obj={controller} />
     </div>
     <div className="column">
-      <CanvasScan width={"" + initialWidth} height={"" + initialHeight} />
+      <div className='canvases'>
+        <canvas id='canvas2d' />
+        <canvas id='canvasgl' />
+      </div>
     </div>
   </div>,
   document.getElementById('render')

@@ -24,7 +24,7 @@
       display: block;
       margin-left: auto;
       margin-right: auto;
-      width: 640px;
+      max-width: 640px;
    }
 
    .curve-editor {
@@ -37,6 +37,10 @@
 
    .column {
       flex: 50%;
+   }
+
+   .ranged-slider {
+      min-width: 100px;
    }
 </style>
 <div id='render'></div>
@@ -77,6 +81,9 @@
       uniform float n_complexity;
       uniform float n_freq;
       uniform vec2 n_amp;
+      uniform float n_offset;
+
+      uniform float g_amount;
 
       uniform sampler2D texture;
       uniform sampler2D curves;
@@ -91,7 +98,6 @@
          float slots = curveRes.y;
 
          vec2 uv = vec2(u, slot / slots);
-
          return texture2D(curves, uv).x * 2.0;
       }
 
@@ -130,6 +136,7 @@
       }
 
       float getDetailedNoise(vec2 uv) {
+         uv += vec2(n_offset, n_offset);
          uv *= 8.0 * n_freq;
          mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
          float f2 = noise( uv );
@@ -149,10 +156,10 @@
    
       void main(void) {
          gl_FragColor = texture2D(texture, 
-            uv 
+            mix(uv, uv 
             + getSineOffset(uv.y)
             + getDirOffset(uv.y)
-            + getNoiseOffset(uv.y)
+            + getNoiseOffset(uv.y), g_amount)
          ); 
       }
    </script>

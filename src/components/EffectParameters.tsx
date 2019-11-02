@@ -1,7 +1,7 @@
-import { RangedSlider } from "./RangedSlider"
+import { RangedSlider } from "./core/RangedSlider"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable"
 import * as React from "react"
-import { CurveEditor } from "./CurveEditor"
+import { CurveEditor } from "./core/CurveEditor"
 import { Curve } from "../Curve"
 
 const ceWidth = 300
@@ -99,8 +99,25 @@ class NoiseDistort extends DistortParameterGroup {
     let freqParamName = `${this.name}-freq`
     let ampNameX = `${this.name}-ampx`
     let ampNameY = `${this.name}-ampy`
+    let offset = `${this.name}-offset`
     let elems = super.getElem()
     elems.push(
+      <RangedSlider
+      key={ampNameX}
+      title="Amp X"
+      min={0} max={.4}
+      default={this.obj.getValue(ampNameX)}
+      step={0.004}
+      parameterName={ampNameX}
+      callbackObject={this.obj} />,
+    <RangedSlider
+      key={ampNameY}
+      title="Amp Y"
+      min={0} max={2.0}
+      default={this.obj.getValue(ampNameY)}
+      step={0.004}
+      parameterName={ampNameY}
+      callbackObject={this.obj} />,
       <RangedSlider
         key={complexityName}
         title="Complexity"
@@ -118,31 +135,23 @@ class NoiseDistort extends DistortParameterGroup {
         parameterName={freqParamName}
         callbackObject={this.obj} />,
       <RangedSlider
-        key={ampNameX}
-        title="Amp X"
-        min={0} max={.4}
-        default={this.obj.getValue(ampNameX)}
-        step={0.004}
-        parameterName={ampNameX}
-        callbackObject={this.obj} />,
-      <RangedSlider
-        key={ampNameY}
-        title="Amp Y"
-        min={0} max={2.0}
-        default={this.obj.getValue(ampNameY)}
-        step={0.004}
-        parameterName={ampNameY}
+        key={offset}
+        title="Offset"
+        min={-3.0} max={3.0}
+        default={this.obj.getValue(offset)}
+        step={0.04}
+        parameterName={offset}
         callbackObject={this.obj} />
     )
     return elems
   }
 }
 
-interface ScanDistortParametersProps {
+interface EffectParametersProps {
   obj: IValueUpdatable
 }
 
-export class ScanDistortParameters extends React.Component<ScanDistortParametersProps, {}> {
+export class EffectParameters extends React.Component<EffectParametersProps, {}> {
   sineHorizontal: SineDistort
   sineVertical: SineDistort
   dirHorizontal: DirectionalDistort
@@ -151,7 +160,7 @@ export class ScanDistortParameters extends React.Component<ScanDistortParameters
 
   obj: IValueUpdatable
 
-  constructor(props: ScanDistortParametersProps) {
+  constructor(props: EffectParametersProps) {
     super(props)
     this.obj = props.obj
   }
@@ -159,11 +168,24 @@ export class ScanDistortParameters extends React.Component<ScanDistortParameters
   render() {
     return (
       <div className="distort-parameters">
-        <SineDistort ref={node => (this.sineHorizontal = node)} name="sineHorizontal" title="Sine Horizontal" obj={this.obj} />
-        <SineDistort ref={node => (this.sineVertical = node)} name="sineVertical" title="Sine Vertical" obj={this.obj} />
-        <DirectionalDistort ref={node => (this.dirHorizontal = node)} name="dirHorizontal" title="Direction Horizontal" obj={this.obj} />
-        <DirectionalDistort ref={node => (this.dirVertical = node)} name="dirVertical" title="Direction Vertical" obj={this.obj} />
-        <NoiseDistort ref={node => (this.noise = node)} name="noise" title="Noise" obj={this.obj} />
+        <RangedSlider
+          title="Global amount"
+          min={0} max={1.0}
+          default={this.obj.getValue('g_amount')}
+          step={0.004}
+          parameterName={'g_amount'}
+          callbackObject={this.obj} />
+
+        <SineDistort ref={node => (this.sineVertical = node)}
+          name="sineVertical" title="Sine Vertical" obj={this.obj} />
+        <SineDistort ref={node => (this.sineHorizontal = node)}
+          name="sineHorizontal" title="Sine Horizontal" obj={this.obj} />
+        <DirectionalDistort ref={node => (this.dirVertical = node)}
+          name="dirVertical" title="Direction Vertical" obj={this.obj} />
+        <DirectionalDistort ref={node => (this.dirHorizontal = node)}
+          name="dirHorizontal" title="Direction Horizontal" obj={this.obj} />
+        <NoiseDistort ref={node => (this.noise = node)}
+          name="noise" title="Noise" obj={this.obj} />
       </div>
     )
   }
