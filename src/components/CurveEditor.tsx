@@ -41,7 +41,7 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
 
 
   handleSvgMouseDown(ev: React.MouseEvent<SVGElement, MouseEvent>) {
-    if (ev.altKey) {
+    if (ev.ctrlKey) {
 
       const svgRect = this.node.getBoundingClientRect();
       const svgX = ev.clientX - svgRect.left;

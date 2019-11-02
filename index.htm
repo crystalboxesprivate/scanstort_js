@@ -80,8 +80,8 @@
       void main(void) {
          float time = uv.y * resolution.y;
          // gl_FragColor = texture2D(texture, uv + getOffset(time)); 
-         gl_FragColor = vec4(sampleCurve(1.0, uv.x), 0, 0, 1);
-         // gl_FragColor = vec4(texture2D(curves, uv).x , 0, 0, 1);
+         //gl_FragColor = vec4(sampleCurve(1.0, uv.x), 0, 0, 1);
+         gl_FragColor = vec4(texture2D(curves, uv).x , 0, 0, 1);
       }
    </script>
 
