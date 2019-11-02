@@ -1,8 +1,8 @@
-import { ICurve, CurvePoint } from "../interfaces/ICurve"
 import { RangedSlider } from "./RangedSlider"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable"
 import * as React from "react"
 import { CurveEditor } from "./CurveEditor"
+import { Curve } from "../Curve"
 
 const ceWidth = 300
 const ceHeight = 25
@@ -23,6 +23,7 @@ abstract class DistortParameterGroup {
         parameterName={this.name + "-weight"}
         callbackObject={this.obj} />,
       <CurveEditor key={this.name + "-curve-weight"}
+        curve={new Curve()}
         width={ceWidth} height={ceHeight}
         param={this.name + "-curve-weight"}
         callbackObject={this.obj} />
@@ -47,6 +48,7 @@ class SineDistort extends DistortParameterGroup {
         parameterName={this.name + "-frequency"}
         callbackObject={this.obj} />,
       <CurveEditor key={this.name + "-frequency-curve"}
+        curve={new Curve()}
         width={ceWidth} height={ceHeight}
         param={this.name + "-frequency-curve"}
         callbackObject={this.obj} />

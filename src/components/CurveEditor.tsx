@@ -1,13 +1,11 @@
 import * as React from "react"
 import { ICurve } from "../interfaces/ICurve"
-import { Curve } from "../Curve"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable"
 
-export interface CurveEditorProps { width: number; height: number; param: string; callbackObject: IValueUpdatable }
+export interface CurveEditorProps { width: number; height: number; param: string; curve: ICurve; callbackObject: IValueUpdatable }
 
 export class CurveEditor extends React.Component<CurveEditorProps, {}> {
   props: CurveEditorProps
-  curve: ICurve
   state: {
     pointId: number
   }
@@ -17,7 +15,6 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
   constructor(props: CurveEditorProps) {
     super(props)
     this.props = props
-    this.curve = new Curve()
 
     this.state = {
       pointId: null,
@@ -26,12 +23,12 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
 
   updateState(pointId: number) {
     this.setState({ pointId: pointId },
-      () => this.props.callbackObject.setValue(this.props.param, this.curve))
+      () => this.props.callbackObject.setValue(this.props.param, this.props.curve))
   }
 
   handleMouseDown(ev: React.MouseEvent<SVGElement, MouseEvent>, isRight: boolean, pointId: number) {
     if (isRight) {
-      this.curve.removePoint(pointId)
+      this.props.curve.removePoint(pointId)
       this.updateState(null)
       ev.preventDefault()
       return
@@ -50,9 +47,9 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
       let x = svgX / +this.props.width
       let y = svgY / +this.props.height
 
-      this.curve.addPoint(x, y)
+      this.props.curve.addPoint(x, y)
 
-      this.updateState(this.curve.getLastPointIndex())
+      this.updateState(this.props.curve.getLastPointIndex())
     }
   }
 
@@ -71,7 +68,7 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
 
       let x = svgX / +this.props.width
       let y = svgY / +this.props.height
-      this.curve.setPointValue(this.state.pointId, x, y)
+      this.props.curve.setPointValue(this.state.pointId, x, y)
 
       this.updateState(this.state.pointId)
     }
@@ -82,14 +79,43 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
     let cy = (norm: number) => norm * +this.props.height
 
     const items: JSX.Element[] = []
-    let pts = this.curve.getCurvePoints()
-
-    for (let x = 0; x < pts.length - 1; x++) {
-      items.push(<line key={"l" + x} x1={cx(pts[x].position)} y1={cy(pts[x].value)}
-        x2={cx(pts[x + 1].position)} y2={cy(pts[x + 1].value)} stroke="#777" strokeWidth="1"></line>)
+    let pts = this.props.curve.getCurvePoints()
+    if (pts.length == 0) {
+      return
     }
 
-    pts = this.curve.getCurvePointsUnsorted()
+    const lineColor = "#777"
+    const lineWidth = 1
+
+    const getLine = (index: number, x1: number, y1: number, x2: number, y2: number, width?: number, color?: string) => <line
+      key={"l" + index}
+      x1={x1} y1={y1}
+      x2={x2} y2={y2}
+      stroke={color == null ? lineColor : color}
+      strokeWidth={width == null ? lineWidth : width} />
+
+    const tolerance = 0.0001
+    if (pts[0].position > tolerance) {
+      items.push(getLine(-1, cx(0.0), cy(pts[0].value),
+        cx(pts[0].position), cy(pts[0].value)))
+    }
+
+    for (let x = 0; x < pts.length - 1; x++) {
+      items.push(
+        getLine(
+          x, cx(pts[x].position), cy(pts[x].value),
+          cx(pts[x + 1].position), cy(pts[x + 1].value
+          )
+        ))
+    }
+
+    let lastIndex = pts.length - 1
+    if (pts[lastIndex].position < 1 - tolerance) {
+      items.push(getLine(-2, cx(1.0), cy(pts[lastIndex].value),
+        cx(pts[lastIndex].position), cy(pts[lastIndex].value)))
+    }
+
+    pts = this.props.curve.getCurvePointsUnsorted()
     const size = 8
     for (let x = 0; x < pts.length; x++) {
       items.push(<rect key={x} name={"p" + x}
