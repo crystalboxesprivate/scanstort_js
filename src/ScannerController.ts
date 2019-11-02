@@ -3,6 +3,7 @@ import { ICanvas } from './interfaces/ICanvas'
 import { WebGLQuad } from "./canvases/WebGLQuad";
 import { Canvas2D } from "./canvases/Canvas2D"
 import { IValueUpdatable } from './interfaces/IValueUpdatable';
+import { ICurve, isCurveInstance } from './interfaces/ICurve';
 
 export class ScannerController implements ICanvas, IValueUpdatable {
   canvasGl: WebGLQuad | null = null
@@ -35,10 +36,6 @@ export class ScannerController implements ICanvas, IValueUpdatable {
     this.handleGlDrawing()
   }
 
-  setValue(name: string, value: any): void {
-
-  }
-
   handleCanvas2dDrawing() {
     this.canvas2d.drawText("download")
   }
@@ -65,18 +62,97 @@ export class ScannerController implements ICanvas, IValueUpdatable {
   }
 
   drawLoop() {
-    let start = 0
+    let that = this
     function update(timestamp: number) {
-      if (!start) start = timestamp;
-      var progress = timestamp - start;
-      if (this.isDirty) {
-        this.handleGlDrawing()
+      if (that.isDirty) {
+        that.handleGlDrawing()
       }
-      if (progress < 2000) {
-        window.requestAnimationFrame(update);
-      }
+      window.requestAnimationFrame(update);
     }
 
     window.requestAnimationFrame(update)
   }
+
+  setValue(name: string, value: any): void {
+    let un = this.canvasGl.uniforms
+    if (isCurveInstance(value)) {
+      let curve = <ICurve>value;
+      let slot = un.curveBuffer.setCurve(curve.getCurvePointBuffer(), name)
+      switch (name) {
+        case "sineHorizontal-curve-weight":
+          un.sh_weightCurveSlot = slot; break;
+        case "sineHorizontal-frequency-curve":
+          un.sh_freqCurveSlot = slot; break;
+        case "sineVertical-curve-weight":
+          un.sv_weightCurveSlot = slot; break;
+        case "sineVertical-frequency-curve":
+          un.sv_freqCurveSlot = slot; break;
+        case "dirHorizontal-curve-weight":
+          un.dh_weightCurveSlot = slot; break;
+        case "dirVertical-curve-weight":
+          un.dv_weightCurveSlot = slot; break;
+        case "noise-curve-weight":
+          un.n_weightCurveSlot = slot; break;
+        default: break;
+      }
+    } else {
+      let val = <number>value
+      switch (name) {
+        case "sineHorizontal-weight":
+          un.sh_weight = val; break;
+        case "sineHorizontal-amp":
+          un.sh_amp = val; break;
+        case "sineHorizontal-frequency":
+          un.sh_freq = val; break;
+
+        case "sineVertical-weight":
+          un.sv_weight = val; break;
+        case "sineVertical-amp":
+          un.sv_amp = val; break;
+        case "sineVertical-frequency":
+          un.sv_freq = val; break;
+
+        case "dirHorizontal-weight":
+          un.dh_weight = val; break;
+        case "dirVertical-weight":
+          un.dv_weight = val; break;
+
+        case "noise-weight":
+          un.n_weight = val; break;
+
+        default: break;
+      }
+    }
+    this.setDirty()
+  }
+
+  getValue(name: string): any {
+    let un = this.canvasGl.uniforms
+    switch (name) {
+      case "sineHorizontal-weight":
+        return un.sh_weight  
+      case "sineHorizontal-amp":
+        return un.sh_amp  
+      case "sineHorizontal-frequency":
+        return un.sh_freq  
+
+      case "sineVertical-weight":
+        return un.sv_weight  
+      case "sineVertical-amp":
+        return un.sv_amp  
+      case "sineVertical-frequency":
+        return un.sv_freq  
+
+      case "dirHorizontal-weight":
+        return un.dh_weight  
+      case "dirVertical-weight":
+        return un.dv_weight  
+
+      case "noise-weight":
+        return un.n_weight  
+
+      default: break;
+    }
+  }
+
 }

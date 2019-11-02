@@ -16,7 +16,6 @@ export class RangedSlider extends React.Component<RangedSliderProps, {}> {
 
     this.handleChange = this.handleChange.bind(this)
     this.getInitialState = this.getInitialState.bind(this)
-
   }
 
   static defaultProps = {
@@ -52,6 +51,7 @@ export class RangedSlider extends React.Component<RangedSliderProps, {}> {
           value={this.state.value}
           onChange={this.handleChange}
           step={this.props.step} />
+        <span className="value-text">{this.state.value}</span>
       </div>
     )
   }

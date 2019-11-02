@@ -1,8 +1,9 @@
 import * as React from "react"
 import { ICurve } from "../interfaces/ICurve"
 import { Curve } from "../Curve"
+import { IValueUpdatable } from "../interfaces/IValueUpdatable"
 
-export interface CurveEditorProps { width: string; height: string; }
+export interface CurveEditorProps { width: number; height: number; param: string; callbackObject: IValueUpdatable }
 
 export class CurveEditor extends React.Component<CurveEditorProps, {}> {
   props: CurveEditorProps
@@ -23,13 +24,19 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
     }
   }
 
+  updateState(pointId: number) {
+    this.setState({ pointId: pointId },
+      () => this.props.callbackObject.setValue(this.props.param, this.curve))
+  }
+
   handleMouseDown(ev: React.MouseEvent<SVGElement, MouseEvent>, isRight: boolean, pointId: number) {
     if (isRight) {
       this.curve.removePoint(pointId)
-      this.setState({ pointId: null });
+      this.updateState(null)
       ev.preventDefault()
+      return
     }
-    this.setState({ pointId: pointId });
+    this.updateState(pointId)
   }
 
 
@@ -45,12 +52,14 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
 
       this.curve.addPoint(x, y)
 
-      this.setState({ pointId: this.curve.getLastPointIndex() })
+      this.updateState(this.curve.getLastPointIndex())
     }
   }
 
   handleMouseUp() {
-    this.setState({ pointId: null })
+    if (this.state.pointId !== null) {
+      this.updateState(null)
+    }
   }
 
   handleMouseMove(event: { clientX: number, clientY: number }) {
@@ -64,7 +73,7 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
       let y = svgY / +this.props.height
       this.curve.setPointValue(this.state.pointId, x, y)
 
-      this.setState({ pointId: this.state.pointId })
+      this.updateState(this.state.pointId)
     }
   }
 
@@ -83,7 +92,7 @@ export class CurveEditor extends React.Component<CurveEditorProps, {}> {
     pts = this.curve.getCurvePointsUnsorted()
     const size = 8
     for (let x = 0; x < pts.length; x++) {
-      items.push(<rect key={x} name={"p" +x}
+      items.push(<rect key={x} name={"p" + x}
         x={cx(pts[x].position) - size / 2}
         y={cy(pts[x].value) - size / 2}
         width={size}

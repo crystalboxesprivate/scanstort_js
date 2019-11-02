@@ -14,6 +14,7 @@
       margin-right: auto;
       width: 640px;
    }
+
    .curve-editor {
       border: 1px solid black;
    }
@@ -32,8 +33,45 @@
 <script id="frag" type="x-shader/x-fragment">
       precision mediump float;
       varying vec2 uv;
+
+      uniform float sh_weight;
+      uniform float sh_amp;
+      uniform float sh_freq;
+      uniform float sh_weightCurveSlot;
+      uniform float sh_freqCurveSlot;
+
+      uniform float sv_weight;
+      uniform float sv_amp;
+      uniform float sv_freq;
+      uniform float sv_weightCurveSlot;
+      uniform float sv_freqCurveSlot;
+
+      uniform float dh_weight;
+      uniform float dh_weightCurveSlot;
+
+      uniform float dv_weight;
+      uniform float dv_weightCurveSlot;
+
+      uniform float n_weight;
+      uniform float n_weightCurveSlot;
+
+
       uniform sampler2D texture;
+      uniform sampler2D curves;
+
       uniform vec2 resolution;
+      uniform vec2 curveRes;
+
+      float sampleCurve(float slot, float u) {
+         u = u < 0.0 ? 0.0 : u > 1.0 ? 1.0 : u;
+
+         float width = curveRes.x;
+         float slots = curveRes.y;
+
+         vec2 uv = vec2(u, slot / slots);
+
+         return texture2D(curves, uv).x ;
+      }
 
       vec2 getOffset(float time) {
          return vec2(cos(time* 0.05) * 0.014, sin(time * 0.25) * 0.05);
@@ -41,7 +79,9 @@
    
       void main(void) {
          float time = uv.y * resolution.y;
-         gl_FragColor = texture2D(texture, uv + getOffset(time)); 
+         // gl_FragColor = texture2D(texture, uv + getOffset(time)); 
+         gl_FragColor = vec4(sampleCurve(1.0, uv.x), 0, 0, 1);
+         // gl_FragColor = vec4(texture2D(curves, uv).x , 0, 0, 1);
       }
    </script>
 

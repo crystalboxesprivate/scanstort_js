@@ -1,6 +1,6 @@
 import { ICurve, CurvePoint } from "./interfaces/ICurve"
 
-const bufferSize = 256
+export const BufferSize = 256
 
 function lerp(start: number, end: number, amount: number): number {
   return (1 - amount) * start + amount * end
@@ -13,11 +13,15 @@ export class Curve implements ICurve {
   isDirty: boolean = true
 
   constructor() {
-    this.buffer = new Float32Array(bufferSize)
+    this.buffer = new Float32Array(BufferSize)
     this.points = [
       { position: 0, value: 0.5 },
       { position: 1, value: 0.5 }
     ]
+  }
+
+  getCurveResolution(): number {
+    return BufferSize
   }
 
   getLastPointIndex(): number {
@@ -28,8 +32,8 @@ export class Curve implements ICurve {
     if (this.isDirty) {
       let pts = this.getCurvePoints()
 
-      for (let x = 0; x < bufferSize; x++) {
-        let u = x / bufferSize
+      for (let x = 0; x < BufferSize; x++) {
+        let u = x / BufferSize
 
         let indexLess = 0
         let indexMore = 0
@@ -41,8 +45,9 @@ export class Curve implements ICurve {
             break;
           }
         }
-
-        this.buffer[x] = lerp(pts[indexLess].value, pts[indexMore].value,
+        
+        // Objects are drawn in the upsidedown orientation. Mirror them
+        this.buffer[x] = 1.0 - lerp(pts[indexLess].value, pts[indexMore].value,
           u - pts[indexLess].position)
       }
     }
@@ -53,7 +58,7 @@ export class Curve implements ICurve {
   getCurvePoints(): CurvePoint[] {
     let pts: CurvePoint[] = []
     for (let pt of this.points) {
-      pts.push({position: pt.position, value: pt.value})
+      pts.push({ position: pt.position, value: pt.value })
     }
     pts.sort((a, b) => (a.position > b.position) ? 1 : ((b.position > a.position) ? -1 : 0))
     return pts
