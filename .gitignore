@@ -1,5 +1,6 @@
 src/*.js
 *.DS_Store
+util-deprecate*
 
 # Logs
 logs
