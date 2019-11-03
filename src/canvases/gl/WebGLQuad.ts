@@ -7,10 +7,11 @@ class Framebuffer {
   fb: WebGLFramebuffer
   framebufferTex: WebGLTexture
   gl: WebGLRenderingContext
+
   canvas:CanvasBase
   resolutionMultiplier: number
 
-  constructor(gl: WebGLRenderingContext, resolutionMultiplier:number, canvas: CanvasBase) {
+  constructor(gl: WebGLRenderingContext, resolutionMultiplier: number, canvas: CanvasBase) {
     this.gl = gl
     this.canvas = canvas
     this.resolutionMultiplier = resolutionMultiplier

@@ -23,6 +23,7 @@ abstract class DistortParameterGroup extends React.Component<GroupProps, {}> {
     this.title = props.title
     this.obj = props.obj
   }
+  
   getWeightMin() { return 0 }
   getWeightMax() { return 1 }
 
