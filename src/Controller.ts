@@ -3,6 +3,7 @@ import { Canvas2D } from './canvases/Canvas2D'
 import { Parameters } from './Parameters'
 import { IValueUpdatable } from './interfaces/IValueUpdatable'
 import { ICurve, isCurveInstance } from './interfaces/ICurve'
+import { IStateLoadable } from './components/IStateLoadable'
 
 export class ScannerController implements IValueUpdatable {
   params: Parameters
@@ -11,8 +12,14 @@ export class ScannerController implements IValueUpdatable {
   canvas2d: Canvas2D | null = null
   isDirty: boolean = true
 
+  state_loadables: IStateLoadable[]
+  
   constructor(params: Parameters) {
     this.params = params
+  }
+
+  registerMe(obj: IStateLoadable) {
+    this.state_loadables.push(obj)
   }
 
   getWidth(): number {

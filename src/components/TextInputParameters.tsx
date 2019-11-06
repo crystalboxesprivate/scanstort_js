@@ -1,6 +1,7 @@
 import React = require("react")
 import { RangedSlider } from "./core/RangedSlider"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable"
+import { IStateLoadable } from "./IStateLoadable"
 
 interface TextInputProps { callbackObj: IValueUpdatable }
 
@@ -10,7 +11,7 @@ const fonts = [
   'Impact'
 ]
 
-export class TextInputParameters extends React.Component<TextInputProps, {}> {
+export class TextInputParameters extends React.Component<TextInputProps, {}> implements IStateLoadable {
   state: { text: string, font: string, size: number, repeats: number }
   callbackObj: IValueUpdatable
   constructor(props: TextInputProps) {
@@ -25,6 +26,8 @@ export class TextInputParameters extends React.Component<TextInputProps, {}> {
     this.callbackObj = props.callbackObj
     this.handleChange = this.handleChange.bind(this);
   }
+
+  refreshState() {}
 
   handleChange(event: React.ChangeEvent<HTMLSelectElement | HTMLTextAreaElement>) {
     let target = event.target

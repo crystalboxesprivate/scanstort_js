@@ -6,9 +6,14 @@ export interface RangedSliderProps {
   step: number, title: string, parameterName: string, callbackObject: IValueUpdatable
 }
 
+export interface RangedSliderState {
+  value:number
+}
+
 export class RangedSlider extends React.Component<RangedSliderProps, {}> {
   props: RangedSliderProps
-  state: { value: number }
+  state: RangedSliderState
+  
   constructor(props: RangedSliderProps) {
     super(props)
     this.props = props

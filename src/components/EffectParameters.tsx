@@ -2,6 +2,7 @@ import { RangedSlider } from "./core/RangedSlider"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable"
 import * as React from "react"
 import { CurveEditor } from "./core/CurveEditor"
+import { IStateLoadable } from "./IStateLoadable"
 
 const ceWidth = 300
 const ceHeight = 25
@@ -12,7 +13,7 @@ interface GroupProps {
   obj: IValueUpdatable
 }
 
-abstract class DistortParameterGroup extends React.Component<GroupProps, {}> {
+abstract class DistortParameterGroup extends React.Component<GroupProps, {}> implements IStateLoadable {
   name: string
   title: string
   obj: IValueUpdatable
@@ -26,22 +27,29 @@ abstract class DistortParameterGroup extends React.Component<GroupProps, {}> {
   
   getWeightMin() { return 0 }
   getWeightMax() { return 1 }
+  get weightParamName() {return  `${this.name}-weight`; }
+  get curveWeightParam() {return  `${this.name}-curve-weight`; }
+
+  weight: RangedSlider
+  weightCurve: CurveEditor
+
+  refreshState() {
+
+  }
 
   getElem(): JSX.Element[] {
-    let weightParamName = `${this.name}-weight`
-    let curveWeightParam = `${this.name}-curve-weight`
     return [
-      <RangedSlider key={weightParamName}
+      <RangedSlider key={this.weightParamName}
         title="Weight"
         min={this.getWeightMin()} max={this.getWeightMax()}
-        default={this.obj.getValue(weightParamName)}
+        default={this.obj.getValue(this.weightParamName)}
         step={0.004}
-        parameterName={weightParamName}
+        parameterName={this.weightParamName}
         callbackObject={this.obj} />,
-      <CurveEditor key={curveWeightParam}
-        curve={this.obj.getValue(curveWeightParam)}
+      <CurveEditor key={this.curveWeightParam}
+        curve={this.obj.getValue(this.curveWeightParam)}
         width={ceWidth} height={ceHeight}
-        param={curveWeightParam}
+        param={this.curveWeightParam}
         callbackObject={this.obj} />
     ]
   }
@@ -57,90 +65,100 @@ abstract class DistortParameterGroup extends React.Component<GroupProps, {}> {
 }
 
 class SineDistort extends DistortParameterGroup {
+  get ampParamName() {  return `${this.name}-amp` }
+  get freqParamName() { return  `${this.name}-frequency` }
+  get freqCurveParamName() {  return `${this.name}-frequency-curve` }
+
+  amp: RangedSlider
+  freq: RangedSlider
+  freqCurve: CurveEditor
+
+  refreshState() {
+    super.refreshState()
+  }
+
   getElem(): JSX.Element[] {
-    let ampParamName = `${this.name}-amp`
-    let freqParamName = `${this.name}-frequency`
-    let freqCurveParamName = `${this.name}-frequency-curve`
     let elems = super.getElem()
     elems.push(
       <RangedSlider
-        key={ampParamName}
+        key={this.ampParamName}
         title="Amplitude"
         min={0} max={.1}
-        default={this.obj.getValue(ampParamName)}
+        default={this.obj.getValue(this.ampParamName)}
         step={0.004}
-        parameterName={ampParamName}
+        parameterName={this.ampParamName}
         callbackObject={this.obj} />,
       <RangedSlider
-        key={freqParamName}
+        key={this.freqParamName}
         title="Frequency"
         min={0} max={.4}
-        default={this.obj.getValue(freqParamName)}
+        default={this.obj.getValue(this.freqParamName)}
         step={0.004}
-        parameterName={freqParamName}
+        parameterName={this.freqParamName}
         callbackObject={this.obj} />,
-      <CurveEditor key={freqCurveParamName}
-        curve={this.obj.getValue(freqCurveParamName)}
+      <CurveEditor key={this.freqCurveParamName}
+        curve={this.obj.getValue(this.freqCurveParamName)}
         width={ceWidth} height={ceHeight}
-        param={freqCurveParamName}
+        param={this.freqCurveParamName}
         callbackObject={this.obj} />
     )
     return elems
   }
 }
 
-class DirectionalDistort extends DistortParameterGroup {
+class DirectionalDistort extends DistortParameterGroup  {
   getWeightMin() { return -1 }
 }
 
-class NoiseDistort extends DistortParameterGroup {
+class NoiseDistort extends DistortParameterGroup  {
+  get complexityName() {return `${this.name}-compl`}
+  get freqParamName() {return `${this.name}-freq`}
+  get ampNameX() {return `${this.name}-ampx`}
+  get ampNameY() {return `${this.name}-ampy`}
+  get offset() {return `${this.name}-offset`}
+
   getElem(): JSX.Element[] {
-    let complexityName = `${this.name}-compl`
-    let freqParamName = `${this.name}-freq`
-    let ampNameX = `${this.name}-ampx`
-    let ampNameY = `${this.name}-ampy`
-    let offset = `${this.name}-offset`
     let elems = super.getElem()
     elems.push(
       <RangedSlider
-        key={ampNameX}
+        key={this.ampNameX}
         title="Amp X"
         min={0} max={.4}
-        default={this.obj.getValue(ampNameX)}
+        default={this.obj.getValue(this.ampNameX)}
         step={0.004}
-        parameterName={ampNameX}
+        parameterName={this.ampNameX}
         callbackObject={this.obj} />,
       <RangedSlider
-        key={ampNameY}
+        key={this.ampNameY}
         title="Amp Y"
         min={0} max={2.0}
-        default={this.obj.getValue(ampNameY)}
+        default={this.obj.getValue(this.ampNameY)}
         step={0.004}
-        parameterName={ampNameY}
+        parameterName={this.ampNameY}
         callbackObject={this.obj} />,
       <RangedSlider
-        key={complexityName}
+        key={this.complexityName}
         title="Complexity"
         min={0} max={1}
-        default={this.obj.getValue(complexityName)}
+        default={this.obj.getValue(this.complexityName)}
         step={0.004}
-        parameterName={complexityName}
+        parameterName={this.complexityName}
         callbackObject={this.obj} />,
       <RangedSlider
-        key={freqParamName}
+        key={this.freqParamName}
         title="Frequency"
         min={0} max={.4}
-        default={this.obj.getValue(freqParamName)}
+        default={this.obj.getValue(this.freqParamName)}
         step={0.004}
-        parameterName={freqParamName}
+        parameterName={this.freqParamName}
         callbackObject={this.obj} />,
       <RangedSlider
-        key={offset}
+        key={this.offset}
         title="Offset"
         min={-3.0} max={3.0}
-        default={this.obj.getValue(offset)}
+        default={this.obj.getValue(this.offset)}
         step={0.04}
-        parameterName={offset}
+        parameterName={this.offset}
         callbackObject={this.obj} />
     )
     return elems
@@ -151,7 +169,13 @@ interface EffectParametersProps {
   obj: IValueUpdatable
 }
 
-export class EffectParameters extends React.Component<EffectParametersProps, {}> {
+export class EffectParameters extends React.Component<EffectParametersProps, {}> 
+implements IStateLoadable {
+
+  globalAmount: RangedSlider
+  amountX: RangedSlider
+  amountY: RangedSlider
+  
   sineHorizontal: SineDistort
   sineVertical: SineDistort
   dirHorizontal: DirectionalDistort
@@ -165,24 +189,36 @@ export class EffectParameters extends React.Component<EffectParametersProps, {}>
     this.obj = props.obj
   }
 
+  refreshState() {
+    this.globalAmount.setState({value: this.obj.getValue('g_amount')})
+    this.amountX.setState({value: this.obj.getValue('g_amountX')})
+    this.amountY.setState({value: this.obj.getValue('g_amountY')})
+
+    this.sineHorizontal.refreshState()
+    this.sineVertical.refreshState()
+    this.dirHorizontal.refreshState()
+    this.dirVertical.refreshState()
+    this.noise.refreshState()
+  }
+
   render() {
     return (
       <div className="distort-parameters">
-        <RangedSlider
+        <RangedSlider ref={node => (this.globalAmount = node)}
           title="Global amount"
           min={0} max={1.0}
           default={this.obj.getValue('g_amount')}
           step={0.004}
           parameterName={'g_amount'}
           callbackObject={this.obj} />
-        <RangedSlider
+        <RangedSlider ref={node => (this.amountX = node)}
           title="Amount X"
           min={0.8} max={1.0}
           default={this.obj.getValue('g_amountX')}
           step={0.001}
           parameterName={'g_amountX'}
           callbackObject={this.obj} />
-        <RangedSlider
+        <RangedSlider ref={node => (this.amountY = node)}
           title="Amount Y"
           min={0.8} max={1.0}
           default={this.obj.getValue('g_amountY')}

@@ -1,12 +1,14 @@
 import * as React from "react"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable";
+import { IStateLoadable } from "./IStateLoadable";
 
 export interface ResolutionFormProps { canvas: IValueUpdatable }
 
-export class ResolutionSettings extends React.Component<ResolutionFormProps, {}>  {
+export class ResolutionSettings extends React.Component<ResolutionFormProps, {}> implements IStateLoadable {
   state: { width: number, height: number }
   canvas: IValueUpdatable
 
+  refreshState() {}
   constructor(props: ResolutionFormProps) {
     super(props);
     this.state = {
