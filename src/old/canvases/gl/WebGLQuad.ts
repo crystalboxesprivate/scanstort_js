@@ -1,8 +1,7 @@
 import { ShaderProgram } from "./ShaderProgram"
 import { UniformParameters } from "./UniformParameters"
-import { ScannerController } from "../../Controller"
+import { Parameters } from "../../Parameters"
 import { CanvasBase, aspect } from "../CanvasBase"
-import { IValueUpdatable } from "../../interfaces/IValueUpdatable"
 
 class Framebuffer {
   fb: WebGLFramebuffer
@@ -61,7 +60,7 @@ export class WebGLQuad extends CanvasBase {
 
   framebuffer: Framebuffer
 
-  constructor(canvasId: string, controller: ScannerController) {
+  constructor(canvasId: string, params: Parameters) {
     super(canvasId)
     this.gl = <WebGLRenderingContext>this.canvas.getContext('webgl')
     if (!this.gl) {
@@ -72,7 +71,8 @@ export class WebGLQuad extends CanvasBase {
       (<HTMLElement>document.getElementById('vert')).innerText,
       (<HTMLElement>document.getElementById('frag')).innerText)
 
-    this.uniforms = new UniformParameters(controller)
+    this.uniforms = new UniformParameters()
+    this.uniforms.params = params
     this.uniforms.init(this.gl)
 
     this.framebuffer = new Framebuffer(this.gl, 1, this)

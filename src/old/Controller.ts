@@ -6,17 +6,16 @@ import { ICurve, isCurveInstance } from './interfaces/ICurve'
 import { IStateLoadable } from './components/IStateLoadable'
 
 export class ScannerController implements IValueUpdatable {
-  get parameters() { return this.params }
-  private params: Parameters
+  params: Parameters
 
   canvasGl: WebGLQuad | null = null
   canvas2d: Canvas2D | null = null
   isDirty: boolean = true
 
   state_loadables: IStateLoadable[]
-
-  constructor() {
-    this.params = new Parameters()
+  
+  constructor(params: Parameters) {
+    this.params = params
   }
 
   registerMe(obj: IStateLoadable) {
@@ -58,7 +57,7 @@ export class ScannerController implements IValueUpdatable {
 
   initGraphics() {
     // set resolution
-    this.canvasGl = new WebGLQuad('canvasgl', this)
+    this.canvasGl = new WebGLQuad('canvasgl', this.params)
     this.canvas2d = new Canvas2D('canvas2d')
     // set styles
     this.canvas2d.width = this.params.width
@@ -108,8 +107,6 @@ export class ScannerController implements IValueUpdatable {
       }
     } else {
       switch (name) {
-        case "parameters":
-          this.params = value; break;
         case "text-textarea":
           un.text = value; break;
         case "text-font":
@@ -171,8 +168,6 @@ export class ScannerController implements IValueUpdatable {
   getValue(name: string): any {
     let un = this.params
     switch (name) {
-      case "parameters":
-        return this.parameters
       case "text-textarea":
         return un.text
       case "text-font":
