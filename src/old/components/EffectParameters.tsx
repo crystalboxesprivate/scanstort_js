@@ -1,4 +1,4 @@
-import { RangedSlider } from "./core/RangedSlider"
+import { RangedSlider } from "../../RangedSlider"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable"
 import * as React from "react"
 import { CurveEditor } from "./core/CurveEditor"

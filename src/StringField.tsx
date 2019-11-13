@@ -7,35 +7,34 @@ export enum StringFieldRepresentation {
 }
 
 export interface StringFieldProps {
-  default?: string,  type?: StringFieldRepresentation
+  default: string,
+  title: string,
+  type: StringFieldRepresentation
 }
 
 export class StringField extends React.Component implements IParameter {
   state: { value: string }
   actualValue: string
 
-  props: {default: string, type: StringFieldRepresentation}
+  props: StringFieldProps
 
   constructor(props: StringFieldProps) {
     super(props)
-    this.props = {
-      default: props.default == null ? "" : props.default,
-      type: props.type == null ? StringFieldRepresentation.TextArea : props.type
-    }
+    this.props = props
   }
 
-  
+
   static defaultProps = {
     default: "",
     title: "default",
     type: StringFieldRepresentation.TextArea
   }
 
-  setDirty() : void {
+  setDirty(): void {
     this.actualValue = this.state.value + "_"
   }
 
-  isChanged() : boolean {
+  isChanged(): boolean {
     if (this.actualValue != this.state.value) {
       this.actualValue = this.state.value
       return true
@@ -43,11 +42,11 @@ export class StringField extends React.Component implements IParameter {
     return false
   }
 
-  get(_?:any): any {
+  get(_?: any): any {
     return this.actualValue
   }
-  
-  set(value: any): void  {
-    this.setState({value: value as string})
+
+  set(value: any): void {
+    this.setState({ value: value as string })
   }
 }

@@ -9,6 +9,13 @@ export class CurvePoint {
 export interface CurveEditorProps { width: number; height: number }
 
 export class Curve extends React.Component<CurveEditorProps, {}> implements IParameter {
+
+
+  static defaultProps = {
+    width: 100,
+    height: 64
+  }
+
   evaluate(u: number): number {
     throw new Error("Method not implemented.");
   }

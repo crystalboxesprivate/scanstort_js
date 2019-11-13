@@ -1,5 +1,5 @@
 import React = require("react")
-import { RangedSlider } from "./core/RangedSlider"
+import { RangedSlider } from "../../RangedSlider"
 import { IValueUpdatable } from "../interfaces/IValueUpdatable"
 import { IStateLoadable } from "./IStateLoadable"
 

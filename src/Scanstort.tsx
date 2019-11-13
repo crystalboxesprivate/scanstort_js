@@ -10,12 +10,35 @@ import { GraphicsContext } from "./graphics/GraphicsContext"
 export class DistortParameters extends React.Component {
   weight: NumberField
   weightCurve: Curve
+
+  elem(): JSX.Element[] {
+    return [
+      <NumberField key="weight" ref={n => this.weight = n} />,
+      <Curve key="weightCurve" ref={n => this.weightCurve = n} />
+    ]
+  }
+
+  render() {
+    return (
+      <div>
+        {this.elem()}
+      </div>
+    )
+  }
 }
 
 export class SineDistort extends DistortParameters {
-  Amplitude: NumberField
-  Frequency: NumberField
-  FrequencyCurve: Curve
+  amplitude: NumberField
+  frequency: NumberField
+  frequencyCurve: Curve
+
+  elem(): JSX.Element[] {
+    let e = super.elem()
+    e.push(<NumberField key="amplitude" ref={n => this.amplitude = n} />)
+    e.push(<NumberField key="frequency" ref={n => this.frequency = n} />)
+    e.push(<Curve key="frequencyCurve" ref={n => this.frequencyCurve = n} />)
+    return e
+  }
 }
 
 export class NoiseDistort extends DistortParameters {
@@ -24,6 +47,16 @@ export class NoiseDistort extends DistortParameters {
   complexity: NumberField
   frequency: NumberField
   offset: NumberField
+
+  elem(): JSX.Element[] {
+    let e = super.elem()
+    e.push(<NumberField key="ampX" ref={n => this.ampX = n} />)
+    e.push(<NumberField key="ampY" ref={n => this.ampY = n} />)
+    e.push(<NumberField key="complexity" ref={n => this.complexity = n} />)
+    e.push(<NumberField key="frequency" ref={n => this.frequency = n} />)
+    e.push(<NumberField key="offset" ref={n => this.offset = n} />)
+    return e
+  }
 }
 
 const CurveBufferCount = 8;
@@ -37,7 +70,7 @@ const dh_weightCurveSlot = 4;
 const dv_weightCurveSlot = 5;
 const n_weightCurveSlot = 6;
 
-export class Scanstort extends React.Component {
+export class Scanstort {
   material: Shader
   materialPresent: Shader
   scale: NumberField
@@ -68,19 +101,34 @@ export class Scanstort extends React.Component {
 
   needsBlit: boolean
 
-  width: 640
-  height: 480
+  width: number = 640
+  height: number = 480
+
+  constructor(width: number, height: number) {
+    this.width = width
+    this.height = height
+  }
+
+  run() {
+    this.start()
+    let that = this
+    let loop = () => {
+      that.update()
+      requestAnimationFrame(loop)
+    }
+    requestAnimationFrame(loop)
+  }
 
   updateUniforms() {
     let _material = this.material
     _material.setFloat("_scale", this.scale.get());
     _material.setFloat("sh_weight", this.sineHorizontal.weight.get());
-    _material.setFloat("sh_amp", this.sineHorizontal.Amplitude.get());
-    _material.setFloat("sh_freq", this.sineHorizontal.Frequency.get());
+    _material.setFloat("sh_amp", this.sineHorizontal.amplitude.get());
+    _material.setFloat("sh_freq", this.sineHorizontal.frequency.get());
 
     _material.setFloat("sv_weight", this.sineVertical.weight.get());
-    _material.setFloat("sv_amp", this.sineVertical.Amplitude.get());
-    _material.setFloat("sv_freq", this.sineVertical.Frequency.get());
+    _material.setFloat("sv_amp", this.sineVertical.amplitude.get());
+    _material.setFloat("sv_freq", this.sineVertical.frequency.get());
 
     _material.setFloat("dh_weight", this.dirHorizontal.weight.get());
     _material.setFloat("dv_weight", this.dirVertical.weight.get());
@@ -109,8 +157,8 @@ export class Scanstort extends React.Component {
 
     if (this.sineHorizontal.weightCurve.isChanged() ||
       this.sineVertical.weightCurve.isChanged() ||
-      this.sineHorizontal.FrequencyCurve.isChanged() ||
-      this.sineVertical.FrequencyCurve.isChanged() ||
+      this.sineHorizontal.frequencyCurve.isChanged() ||
+      this.sineVertical.frequencyCurve.isChanged() ||
       this.dirHorizontal.weightCurve.isChanged() ||
       this.dirVertical.weightCurve.isChanged() ||
       this.noise.weightCurve.isChanged()) {
@@ -127,8 +175,8 @@ export class Scanstort extends React.Component {
       let u = x / CurveBufferLenght;
       this.curveArray[sh_weightCurveSlot * l + x] = this.sineHorizontal.weightCurve.evaluate(u);
       this.curveArray[sv_weightCurveSlot * l + x] = this.sineVertical.weightCurve.evaluate(u);
-      this.curveArray[sh_freqCurveSlot * l + x] = this.sineHorizontal.FrequencyCurve.evaluate(u);
-      this.curveArray[sv_freqCurveSlot * l + x] = this.sineVertical.FrequencyCurve.evaluate(u);
+      this.curveArray[sh_freqCurveSlot * l + x] = this.sineHorizontal.frequencyCurve.evaluate(u);
+      this.curveArray[sv_freqCurveSlot * l + x] = this.sineVertical.frequencyCurve.evaluate(u);
       this.curveArray[dh_weightCurveSlot * l + x] = this.dirHorizontal.weightCurve.evaluate(u);
       this.curveArray[dv_weightCurveSlot * l + x] = this.dirVertical.weightCurve.evaluate(u);
       this.curveArray[n_weightCurveSlot * l + x] = this.noise.weightCurve.evaluate(u);
@@ -157,12 +205,12 @@ export class Scanstort extends React.Component {
     if (
       this.scale.isChanged() ||
       this.sineHorizontal.weight.isChanged() ||
-      this.sineHorizontal.Amplitude.isChanged() ||
-      this.sineHorizontal.Frequency.isChanged() ||
+      this.sineHorizontal.amplitude.isChanged() ||
+      this.sineHorizontal.frequency.isChanged() ||
 
       this.sineVertical.weight.isChanged() ||
-      this.sineVertical.Amplitude.isChanged() ||
-      this.sineVertical.Frequency.isChanged() ||
+      this.sineVertical.amplitude.isChanged() ||
+      this.sineVertical.frequency.isChanged() ||
 
       this.dirHorizontal.weight.isChanged() ||
       this.dirVertical.weight.isChanged() ||
@@ -200,7 +248,6 @@ export class Scanstort extends React.Component {
     this.curves = this.graphicsContext.newTexture(CurveBufferLenght, CurveBufferCount);
     this.targetTexture = this.graphicsContext.newTexture(this.width, this.height);
     this.renderTexture = this.graphicsContext.newTexture(this.width, this.height);
-    // allocate new cairo surface to render
   }
 
   aspect(pixel: number): number {
@@ -234,7 +281,7 @@ export class Scanstort extends React.Component {
     );
   }
 
-  render() {
+  getParameters(): JSX.Element {
     return (
       <div>
         <NumberField ref={n => this.scale = n} />
