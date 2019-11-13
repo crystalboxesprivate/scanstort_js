@@ -14,6 +14,10 @@ const fonts = [
 export class TextInputParameters extends React.Component<TextInputProps, {}> implements IStateLoadable {
   state: { text: string, font: string, size: number, repeats: number }
   callbackObj: IValueUpdatable
+
+  textSizeSlider: RangedSlider
+  textRepeatsSlider: RangedSlider
+
   constructor(props: TextInputProps) {
     super(props)
     let obj = props.callbackObj
@@ -24,10 +28,9 @@ export class TextInputParameters extends React.Component<TextInputProps, {}> imp
       repeats: obj.getValue("text-repeats")
     }
     this.callbackObj = props.callbackObj
-    this.handleChange = this.handleChange.bind(this);
+    this.handleChange = this.handleChange.bind(this)
   }
 
-  refreshState() {}
 
   handleChange(event: React.ChangeEvent<HTMLSelectElement | HTMLTextAreaElement>) {
     let target = event.target
@@ -49,22 +52,39 @@ export class TextInputParameters extends React.Component<TextInputProps, {}> imp
     return items
   }
 
+
+  refreshState() {
+    this.textSizeSlider.setState({ value: this.callbackObj.getValue(this.textSizeParamName) })
+    this.textRepeatsSlider.setState({ value: this.callbackObj.getValue(this.textRepeatsParamName) })
+    let state = this.state
+    state.text = this.callbackObj.getValue(this.textAreaParamName)
+    state.font = this.callbackObj.getValue(this.textFontParamName)
+    this.setState(state)
+  }
+
+  get textRepeatsParamName() { return "text-repeats" }
+  get textSizeParamName() { return "text-size" }
+  get textAreaParamName() { return "text-textarea" }
+  get textFontParamName() { return "text-font" }
+
   render() {
     return (
       <div className="input-params">
-        <textarea name="text-textarea" value={this.state.text} onChange={this.handleChange} />
+        <textarea name={this.textAreaParamName} value={this.state.text} onChange={this.handleChange} />
         <label>
           Font:
-        <select name="text-font" value={this.state.font}
+        <select name={this.textFontParamName} value={this.state.font}
             onChange={this.handleChange}>
             {this.getItems()}
           </select>
         </label>
 
-        <RangedSlider min={1} max={200} default={78} step={1} title="Text Size"
-          parameterName="text-size" callbackObject={this.callbackObj} />
-        <RangedSlider min={0} max={20} default={10} step={1} title="Repeats"
-          parameterName="text-repeats" callbackObject={this.callbackObj} />
+        <RangedSlider ref={node => (this.textSizeSlider = node)}
+          min={1} max={200} default={78} step={1} title="Text Size"
+          parameterName={this.textSizeParamName} callbackObject={this.callbackObj} />
+        <RangedSlider ref={node => (this.textRepeatsSlider = node)}
+          min={0} max={20} default={10} step={1} title="Repeats"
+          parameterName={this.textRepeatsParamName} callbackObject={this.callbackObj} />
       </div>
     )
   }

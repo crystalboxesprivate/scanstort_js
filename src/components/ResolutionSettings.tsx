@@ -8,7 +8,6 @@ export class ResolutionSettings extends React.Component<ResolutionFormProps, {}>
   state: { width: number, height: number }
   canvas: IValueUpdatable
 
-  refreshState() {}
   constructor(props: ResolutionFormProps) {
     super(props);
     this.state = {
@@ -20,36 +19,47 @@ export class ResolutionSettings extends React.Component<ResolutionFormProps, {}>
     this.handleChange = this.handleChange.bind(this)
   }
 
+  get canvasWidthParamName() { return "width" }
+  get canvasHeightParamName() { return "height" }
+
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     let val = Math.max(+event.target.value, 1)
     let width = this.state.width
     let height = this.state.height
 
-    if (event.target.name == "canvas-width") {
+    if (event.target.name == this.canvasWidthParamName) {
       if (val != this.state.width) {
         width = val
-        this.canvas.setValue("width", width)
+        this.canvas.setValue(this.canvasWidthParamName, width)
       }
     }
 
-    if (event.target.name == "canvas-height") {
+    if (event.target.name == this.canvasHeightParamName) {
       if (val != this.state.height) {
         height = val
-        this.canvas.setValue("height", height)
+        this.canvas.setValue(this.canvasHeightParamName, height)
       }
     }
 
     this.setState({ width: width, height: height })
   }
 
+  refreshState() {
+    this.setState({ width: this.canvas.getValue(this.canvasWidthParamName), 
+      height: this.canvas.getValue(this.canvasHeightParamName) })
+  }
+
+
   render() {
     return (
       <div style={{ padding: 10 }}>
         <span>Width: </span>
-        <input type="text" value={this.state.width} name="canvas-width" onChange={this.handleChange} />
+        <input type="text" value={this.state.width}
+          name={this.canvasWidthParamName} onChange={this.handleChange} />
         <br />
         <span>Height: </span>
-        <input type="text" value={this.state.height} name="canvas-height" onChange={this.handleChange} />
+        <input type="text" value={this.state.height}
+          name={this.canvasHeightParamName} onChange={this.handleChange} />
       </div>
     );
   }

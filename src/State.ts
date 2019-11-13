@@ -1,6 +1,4 @@
-import { Parameters } from './Parameters';
-
-export function packState(parameters: Parameters):string {
+export function packState(parameters: object):string {
   let arr = new TextEncoder().encode(JSON.stringify(parameters))
   arr.reverse()
   let packedState = ''

@@ -24,29 +24,33 @@ abstract class DistortParameterGroup extends React.Component<GroupProps, {}> imp
     this.title = props.title
     this.obj = props.obj
   }
-  
+
   getWeightMin() { return 0 }
   getWeightMax() { return 1 }
-  get weightParamName() {return  `${this.name}-weight`; }
-  get curveWeightParam() {return  `${this.name}-curve-weight`; }
+  get weightParamName() { return `${this.name}-weight`; }
+  get curveWeightParam() { return `${this.name}-curve-weight`; }
 
-  weight: RangedSlider
-  weightCurve: CurveEditor
 
   refreshState() {
-
+    this.weightSlider.setState({ value: this.obj.getValue(this.weightParamName) })
+    this.weightCurve.updateState(null)
   }
+
+  weightSlider: RangedSlider
+  weightCurve: CurveEditor
 
   getElem(): JSX.Element[] {
     return [
-      <RangedSlider key={this.weightParamName}
+      <RangedSlider ref={node => (this.weightSlider = node)}
+        key={this.weightParamName}
         title="Weight"
         min={this.getWeightMin()} max={this.getWeightMax()}
         default={this.obj.getValue(this.weightParamName)}
         step={0.004}
         parameterName={this.weightParamName}
         callbackObject={this.obj} />,
-      <CurveEditor key={this.curveWeightParam}
+      <CurveEditor ref={node => (this.weightCurve = node)}
+        key={this.curveWeightParam}
         curve={this.obj.getValue(this.curveWeightParam)}
         width={ceWidth} height={ceHeight}
         param={this.curveWeightParam}
@@ -65,9 +69,9 @@ abstract class DistortParameterGroup extends React.Component<GroupProps, {}> imp
 }
 
 class SineDistort extends DistortParameterGroup {
-  get ampParamName() {  return `${this.name}-amp` }
-  get freqParamName() { return  `${this.name}-frequency` }
-  get freqCurveParamName() {  return `${this.name}-frequency-curve` }
+  get ampParamName() { return `${this.name}-amp` }
+  get freqParamName() { return `${this.name}-frequency` }
+  get freqCurveParamName() { return `${this.name}-frequency-curve` }
 
   amp: RangedSlider
   freq: RangedSlider
@@ -75,12 +79,15 @@ class SineDistort extends DistortParameterGroup {
 
   refreshState() {
     super.refreshState()
+    this.amp.setState({ value: this.obj.getValue(this.ampParamName) })
+    this.freq.setState({ value: this.obj.getValue(this.freqCurveParamName) })
+    this.freqCurve.updateState(null)
   }
 
   getElem(): JSX.Element[] {
     let elems = super.getElem()
     elems.push(
-      <RangedSlider
+      <RangedSlider ref={node => (this.amp = node)}
         key={this.ampParamName}
         title="Amplitude"
         min={0} max={.1}
@@ -88,7 +95,7 @@ class SineDistort extends DistortParameterGroup {
         step={0.004}
         parameterName={this.ampParamName}
         callbackObject={this.obj} />,
-      <RangedSlider
+      <RangedSlider ref={node => (this.freq = node)}
         key={this.freqParamName}
         title="Frequency"
         min={0} max={.4}
@@ -96,7 +103,8 @@ class SineDistort extends DistortParameterGroup {
         step={0.004}
         parameterName={this.freqParamName}
         callbackObject={this.obj} />,
-      <CurveEditor key={this.freqCurveParamName}
+      <CurveEditor ref={node => (this.freqCurve = node)}
+        key={this.freqCurveParamName}
         curve={this.obj.getValue(this.freqCurveParamName)}
         width={ceWidth} height={ceHeight}
         param={this.freqCurveParamName}
@@ -106,21 +114,36 @@ class SineDistort extends DistortParameterGroup {
   }
 }
 
-class DirectionalDistort extends DistortParameterGroup  {
+class DirectionalDistort extends DistortParameterGroup {
   getWeightMin() { return -1 }
 }
 
-class NoiseDistort extends DistortParameterGroup  {
-  get complexityName() {return `${this.name}-compl`}
-  get freqParamName() {return `${this.name}-freq`}
-  get ampNameX() {return `${this.name}-ampx`}
-  get ampNameY() {return `${this.name}-ampy`}
-  get offset() {return `${this.name}-offset`}
+class NoiseDistort extends DistortParameterGroup {
+  get complexityName() { return `${this.name}-compl` }
+  get freqParamName() { return `${this.name}-freq` }
+  get ampNameX() { return `${this.name}-ampx` }
+  get ampNameY() { return `${this.name}-ampy` }
+  get offset() { return `${this.name}-offset` }
+
+  refreshState() {
+    super.refreshState()
+    this.ampX.setState({value: this.obj.getValue(this.ampNameX)})
+    this.ampY.setState({value: this.obj.getValue(this.ampNameY)})
+    this.complexity.setState({value: this.obj.getValue(this.complexityName)})
+    this.frequency.setState({value: this.obj.getValue(this.freqParamName)})
+    this.offsetSlider.setState({value: this.obj.getValue(this.offset)})
+  }
+
+  ampX: RangedSlider
+  ampY: RangedSlider
+  complexity: RangedSlider
+  frequency: RangedSlider
+  offsetSlider: RangedSlider
 
   getElem(): JSX.Element[] {
     let elems = super.getElem()
     elems.push(
-      <RangedSlider
+      <RangedSlider ref={node => (this.ampX = node)}
         key={this.ampNameX}
         title="Amp X"
         min={0} max={.4}
@@ -128,7 +151,7 @@ class NoiseDistort extends DistortParameterGroup  {
         step={0.004}
         parameterName={this.ampNameX}
         callbackObject={this.obj} />,
-      <RangedSlider
+      <RangedSlider ref={node => (this.ampY = node)}
         key={this.ampNameY}
         title="Amp Y"
         min={0} max={2.0}
@@ -136,7 +159,7 @@ class NoiseDistort extends DistortParameterGroup  {
         step={0.004}
         parameterName={this.ampNameY}
         callbackObject={this.obj} />,
-      <RangedSlider
+      <RangedSlider ref={node => (this.complexity = node)}
         key={this.complexityName}
         title="Complexity"
         min={0} max={1}
@@ -144,7 +167,7 @@ class NoiseDistort extends DistortParameterGroup  {
         step={0.004}
         parameterName={this.complexityName}
         callbackObject={this.obj} />,
-      <RangedSlider
+      <RangedSlider ref={node => (this.frequency = node)}
         key={this.freqParamName}
         title="Frequency"
         min={0} max={.4}
@@ -152,7 +175,7 @@ class NoiseDistort extends DistortParameterGroup  {
         step={0.004}
         parameterName={this.freqParamName}
         callbackObject={this.obj} />,
-      <RangedSlider
+      <RangedSlider ref={node => (this.offsetSlider = node)}
         key={this.offset}
         title="Offset"
         min={-3.0} max={3.0}
@@ -169,13 +192,13 @@ interface EffectParametersProps {
   obj: IValueUpdatable
 }
 
-export class EffectParameters extends React.Component<EffectParametersProps, {}> 
-implements IStateLoadable {
+export class EffectParameters extends React.Component<EffectParametersProps, {}>
+  implements IStateLoadable {
 
   globalAmount: RangedSlider
   amountX: RangedSlider
   amountY: RangedSlider
-  
+
   sineHorizontal: SineDistort
   sineVertical: SineDistort
   dirHorizontal: DirectionalDistort
@@ -190,9 +213,9 @@ implements IStateLoadable {
   }
 
   refreshState() {
-    this.globalAmount.setState({value: this.obj.getValue('g_amount')})
-    this.amountX.setState({value: this.obj.getValue('g_amountX')})
-    this.amountY.setState({value: this.obj.getValue('g_amountY')})
+    this.globalAmount.setState({ value: this.obj.getValue('g_amount') })
+    this.amountX.setState({ value: this.obj.getValue('g_amountX') })
+    this.amountY.setState({ value: this.obj.getValue('g_amountY') })
 
     this.sineHorizontal.refreshState()
     this.sineVertical.refreshState()

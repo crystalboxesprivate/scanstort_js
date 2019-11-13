@@ -1,10 +1,13 @@
-import { Parameters } from "../../Parameters"
 import { CurveBufferTexture } from "./CurveBuffer"
+import { ScannerController } from "../../Controller"
 
 export class UniformParameters {
-  params: Parameters
+  c: ScannerController
   gl: WebGLRenderingContext
   curveBuffer: CurveBufferTexture
+  constructor(controller: ScannerController) {
+    this.c = controller
+  }
 
   init(gl: WebGLRenderingContext) {
     this.gl = gl
@@ -13,7 +16,7 @@ export class UniformParameters {
 
   setParams(program: WebGLProgram) {
     let gl = this.gl
-    const params = this.params
+    const params = this.c.parameters
     const uniform1f = (name: string, val: number) =>
       gl.uniform1f(gl.getUniformLocation(program, name), val)
 
