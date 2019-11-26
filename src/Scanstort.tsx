@@ -6,14 +6,37 @@ import { Shader } from "./graphics/Shader"
 import { CanvasContext } from "./graphics/CanvasContext"
 import { Texture } from "./graphics/Texture"
 import { GraphicsContext } from "./graphics/GraphicsContext"
+import { RenderTexture } from "./graphics/RenderTexture"
+
+
+interface DistortParametersProps {
+  title: string,
+  defaultWeight: number
+}
 
 export class DistortParameters extends React.Component {
   weight: NumberField
   weightCurve: Curve
+  
+
+  props: DistortParametersProps
+
+  static defaultProps: DistortParametersProps = {
+    title: "Distort Parameters",
+    defaultWeight: 1.0
+  }
+
+  constructor(props: DistortParametersProps) {
+    super(props)
+    this.props = props
+  }
+
+  getWeightMin() {return 0.0}
+  getWeightMax() {return 1.0}
 
   elem(): JSX.Element[] {
     return [
-      <NumberField key="weight" ref={n => this.weight = n} />,
+      <NumberField key="weight" ref={n => this.weight = n} title="Weight" step={0.001} min={this.getWeightMin()} max={this.getWeightMax()} default={this.props.defaultWeight} />,
       <Curve key="weightCurve" ref={n => this.weightCurve = n} />
     ]
   }
@@ -21,10 +44,15 @@ export class DistortParameters extends React.Component {
   render() {
     return (
       <div>
+        <h3>{this.props.title}</h3>
         {this.elem()}
       </div>
     )
   }
+}
+
+export class DirectionalDistort extends DistortParameters {
+  getWeightMin() {return -1.0}
 }
 
 export class SineDistort extends DistortParameters {
@@ -34,8 +62,8 @@ export class SineDistort extends DistortParameters {
 
   elem(): JSX.Element[] {
     let e = super.elem()
-    e.push(<NumberField key="amplitude" ref={n => this.amplitude = n} />)
-    e.push(<NumberField key="frequency" ref={n => this.frequency = n} />)
+    e.push(<NumberField key="amplitude" ref={n => this.amplitude = n} title="Amplitude" min={0.0} max={.1} default={.036} step={0.0001} />)
+    e.push(<NumberField key="frequency" ref={n => this.frequency = n} title="Frequency" min={0.0} max={.1} default={.036} step={0.0001} />)
     e.push(<Curve key="frequencyCurve" ref={n => this.frequencyCurve = n} />)
     return e
   }
@@ -50,11 +78,11 @@ export class NoiseDistort extends DistortParameters {
 
   elem(): JSX.Element[] {
     let e = super.elem()
-    e.push(<NumberField key="ampX" ref={n => this.ampX = n} />)
-    e.push(<NumberField key="ampY" ref={n => this.ampY = n} />)
-    e.push(<NumberField key="complexity" ref={n => this.complexity = n} />)
-    e.push(<NumberField key="frequency" ref={n => this.frequency = n} />)
-    e.push(<NumberField key="offset" ref={n => this.offset = n} />)
+    e.push(<NumberField key="ampX" title="Amplitude X" min={0.0} max={.4} default={.036} step={0.001} ref={n => this.ampX = n} />)
+    e.push(<NumberField key="ampY" title="Amplitude Y" min={0.0} max={2.0} default={.1} step={0.0001} ref={n => this.ampY = n} />)
+    e.push(<NumberField key="complexity" title="Complexity" min={0.0} max={1.0} default={.5} step={0.001} ref={n => this.complexity = n} />)
+    e.push(<NumberField key="frequency" title="Frequency" min={0.0} max={.4} default={1.036} step={0.001} ref={n => this.frequency = n} />)
+    e.push(<NumberField key="offset" title="Offset" min={-3.0} max={3.0} default={.0} step={0.001} ref={n => this.offset = n} />)
     return e
   }
 }
@@ -93,7 +121,7 @@ export class Scanstort {
 
   needsRefresh: boolean = false;
   targetTexture: Texture;
-  renderTexture: Texture;
+  renderTexture: RenderTexture;
 
   // create structured buffers of curves
   curves: Texture;
@@ -247,7 +275,10 @@ export class Scanstort {
   start() {
     this.curves = this.graphicsContext.newTexture(CurveBufferLenght, CurveBufferCount);
     this.targetTexture = this.graphicsContext.newTexture(this.width, this.height);
-    this.renderTexture = this.graphicsContext.newTexture(this.width, this.height);
+    this.renderTexture = this.graphicsContext.newRenderTexture(this.width, this.height);
+  
+    this.material = this.graphicsContext.newShader("vert", "frag")
+    this.materialPresent = this.graphicsContext.newShader("vert", "fragPresent")
   }
 
   aspect(pixel: number): number {
@@ -255,21 +286,17 @@ export class Scanstort {
   }
 
   updateCairo() {
-    throw new Error("Not implemented");
-    // Cairo.SetSourceRGBA(cairo.Ctx, 1, 1, 1, 1);
-    // Cairo.Paint(cairo.Ctx);
+    let ctx = this.cairo.ctx
+    ctx.fillStyle = "white"
+    ctx.fillRect(0, 0, this.aspect(this.width), this.aspect(this.height))
+    ctx.fillStyle = "black"
 
-    // Cairo.SetSourceRGB(cairo.Ctx, 0, 0, 0);
-    // Cairo.SetFontSize(cairo.Ctx, Aspect(textSize));
+    ctx.font = `${this.aspect(this.textSize.get())}px Arial`
+    for (let x = 0; x < this.repeats.get(); x++) {
+      ctx.fillText(this.text.get(), this.aspect(100), this.aspect(x * 80))
+    }
 
-    // for (int x = 0; x < repeats; x++)
-    // {
-    //   Cairo.MoveTo(cairo.Ctx, Aspect(100.0f), x * Aspect(80.0f));
-    //   Cairo.ShowText(cairo.Ctx, text);
-    // }
-
-    // targetTexture.SetPixelData(cairo.BufferArray, 0, 0);
-    // targetTexture.Apply();
+    this.targetTexture.setData(this.cairo.getPixels(0, 0, this.width, this.height))
   }
 
   getRenderOut(): JSX.Element {
@@ -284,20 +311,20 @@ export class Scanstort {
   getParameters(): JSX.Element {
     return (
       <div>
-        <NumberField ref={n => this.scale = n} />
-        <StringField ref={n => this.text = n} />
-        <NumberField ref={n => this.textSize = n} />
-        <NumberField ref={n => this.repeats = n} />
+        <NumberField ref={n => this.scale = n} min={0.01} max={9.0} title="Scale" default={0.5} />
+        <StringField ref={n => this.text = n} default="distort" title="Text" />
+        <NumberField ref={n => this.textSize = n} min={1} max={200} step={1} default={78} title={"Font Size"} />
+        <NumberField ref={n => this.repeats = n} min={0} max={20} step={1} default={10} title="Repeats" />
 
-        <NumberField ref={n => this.globalAmount = n} />
-        <NumberField ref={n => this.amountX = n} />
-        <NumberField ref={n => this.amountY = n} />
+        <NumberField ref={n => this.globalAmount = n} min={0} max={1} step={0.001} title="Global Amount" default={1} />
+        <NumberField ref={n => this.amountX = n} min={0} max={1} step={0.001} title="Amount X" default={1} />
+        <NumberField ref={n => this.amountY = n} min={0} max={1} step={0.001} title="Amount X" default={.999} />
 
-        <SineDistort ref={n => this.sineVertical = n} />
-        <SineDistort ref={n => this.sineHorizontal = n} />
-        <DistortParameters ref={n => this.dirVertical = n} />
-        <DistortParameters ref={n => this.dirHorizontal = n} />
-        <NoiseDistort ref={n => this.noise = n} />
+        <SineDistort ref={n => this.sineVertical = n} title="Sine Vertical" />
+        <SineDistort ref={n => this.sineHorizontal = n} title="Sine Horizontal" />
+        <DirectionalDistort ref={n => this.dirVertical = n} title="Directional Vertical" />
+        <DirectionalDistort ref={n => this.dirHorizontal = n} title="Directional Horizontal" />
+        <NoiseDistort ref={n => this.noise = n} title="Noise Distort" />
       </div>
     );
   }

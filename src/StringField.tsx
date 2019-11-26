@@ -3,7 +3,8 @@ import { IParameter } from "./IParameter"
 
 export enum StringFieldRepresentation {
   TextField,
-  TextArea
+  TextArea,
+  Select
 }
 
 export interface StringFieldProps {
@@ -27,7 +28,8 @@ export class StringField extends React.Component implements IParameter {
   static defaultProps = {
     default: "",
     title: "default",
-    type: StringFieldRepresentation.TextArea
+    type: StringFieldRepresentation.TextArea,
+    selection: ["A", "B"]
   }
 
   setDirty(): void {
@@ -42,11 +44,24 @@ export class StringField extends React.Component implements IParameter {
     return false
   }
 
+  handleChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+    this.setState({ value: event.target.value });
+  }
+
   get(_?: any): any {
-    return this.actualValue
+    return this.state.value
   }
 
   set(value: any): void {
     this.setState({ value: value as string })
+  }
+
+  render() {
+    if (this.props.type == StringFieldRepresentation.TextArea) {
+      return (<textarea name="text-textarea" value={this.state.value} onChange={this.handleChange} />);
+    }
+    else {
+      throw new Error("Not implemented");
+    }
   }
 }

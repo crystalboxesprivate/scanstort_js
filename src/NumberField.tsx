@@ -51,7 +51,7 @@ export class NumberField extends React.Component implements IParameter {
   }
 
   get(_?: any): any {
-    return this.actualValue
+    return this.state.value
   }
 
   set(value: any): void {

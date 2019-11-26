@@ -2,7 +2,7 @@ import { CanvasBase, aspect } from "./CanvasBase"
 
 export class Canvas2D extends CanvasBase {
   ctx: CanvasRenderingContext2D
-  
+
   constructor(canvasId: string) {
     super(canvasId)
     let ctx = this.canvas.getContext("2d")
@@ -27,5 +27,9 @@ export class Canvas2D extends CanvasBase {
     for (let x = 0; x < repeats; x++) {
       ctx.fillText(text, aspect(100), aspect(x * 80))
     }
+  }
+
+  getPixels(startX: number, startY: number, width: number, height: number): Uint8ClampedArray {
+    return this.ctx.getImageData(0, 0, width, height).data
   }
 }
