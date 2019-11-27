@@ -17,8 +17,21 @@ export class Curve extends React.Component<CurveEditorProps, {}> implements IPar
   }
 
   evaluate(u: number): number {
-    throw new Error("Method not implemented.");
+    let lerp = function (v0: number, v1: number, t: number) {
+      return v0 * (1 - t) + v1 * t
+    };
+    let pts = this.points
+    for (let x = 0; x < pts.length - 1; x++) {
+      let point = pts[x]
+      let point2 = pts[x + 1]
+      if (u > point.position && u < point2.position ) {
+        let off = u - point.position
+        let dist = point2.position - point.position
+        return lerp(point.value, point2.value, off / dist)
+      }
+    }
   }
+
   points: CurvePoint[]
   private isDirty: boolean = true
 

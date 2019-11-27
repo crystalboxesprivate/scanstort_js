@@ -21,9 +21,9 @@ export class StringField extends React.Component implements IParameter {
 
   constructor(props: StringFieldProps) {
     super(props)
+    this.state = {value: props.default};
     this.props = props
   }
-
 
   static defaultProps = {
     default: "",

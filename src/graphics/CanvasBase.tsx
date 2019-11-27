@@ -1,5 +1,7 @@
 import * as React from "react"
 
+export interface CanvasBaseProps { width: number; height: number }
+
 export class CanvasBase extends React.Component {
   state: {
     width: number,
@@ -26,17 +28,18 @@ export class CanvasBase extends React.Component {
     return this._canvas
   }
 
-
   constructor(props: { width: number, height: number }) {
     super(props)
-    this.state.width = props.width
-    this.state.height = props.height
-    throw new Error("Not implemented.")
+    this.state = {width: props.width, height: props.height}
+  }
+
+  get displayCss() {
+    return { display: 'none' }
   }
 
   render() {
     return (
-      <canvas id={this.htmlId} width={this.state.width} height={this.state.height} style={{ display: 'none' }} />
+      <canvas id={this.htmlId} width={this.state.width} height={this.state.height} style={this.displayCss} />
     )
   }
 }

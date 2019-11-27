@@ -106,7 +106,8 @@
          float slots = curveRes.y;
 
          vec2 uv = vec2(u, slot / slots);
-         return texture2D(curves, uv).x * 2.0;
+         // return texture2D(curves, uv).x * 2.0;
+         return 1.0;
       }
 
       vec2 getSineOffset(float u) {
@@ -175,7 +176,9 @@
             * texture2D(texture, 
                mix(uv, offset, g_amount.z * g_amount.y)
             ).x, 1.0
-         ); 
+         );
+         
+         //gl_FragColor = vec4(uv, g_amount.z, 1);
       }
    </script>
 

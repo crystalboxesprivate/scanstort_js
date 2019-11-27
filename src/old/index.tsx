@@ -3,8 +3,8 @@ import * as ReactDOM from 'react-dom';
 
 import { ResolutionSettings } from './components/ResolutionSettings'
 import { ScannerController } from './Controller'
-import { EffectParameters } from './components/EffectParameters';
-import { TextInputParameters } from './components/TextInputParameters';
+// import { EffectParameters } from './components/EffectParameters';
+// import { TextInputParameters } from './components/TextInputParameters';
 import { Parameters } from './Parameters';
 import { packState, unpackState } from './State';
 
@@ -20,9 +20,9 @@ function printState(e: React.MouseEvent) {
 ReactDOM.render(
   <div className="row">
     <div className="params column">
-      <TextInputParameters callbackObj={controller} />
+      {/* <TextInputParameters callbackObj={controller} /> */}
       <ResolutionSettings canvas={controller} />
-      <EffectParameters obj={controller} />
+      {/* <EffectParameters obj={controller} /> */}
       <button onClick={printState}>
         Output state
       </button>

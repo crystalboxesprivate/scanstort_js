@@ -198,16 +198,30 @@ export class Scanstort {
     if (this.curves == null)
       return;
 
+    if (!this.curveArray) {
+      this.curveArray = new Uint8Array(CurveBufferLenght * CurveBufferCount)
+      this.curveArray.fill(127)
+    }
+
+    let toByte = function(f:number):number {
+      let byteVal = Math.floor(f * 255)
+      return byteVal > 255
+        ? 255
+        : byteVal < 0
+          ? 0
+          : byteVal
+    }
+
     for (var x = 0; x < CurveBufferLenght; x++) {
-      const l = CurveBufferLenght;
-      let u = x / CurveBufferLenght;
-      this.curveArray[sh_weightCurveSlot * l + x] = this.sineHorizontal.weightCurve.evaluate(u);
-      this.curveArray[sv_weightCurveSlot * l + x] = this.sineVertical.weightCurve.evaluate(u);
-      this.curveArray[sh_freqCurveSlot * l + x] = this.sineHorizontal.frequencyCurve.evaluate(u);
-      this.curveArray[sv_freqCurveSlot * l + x] = this.sineVertical.frequencyCurve.evaluate(u);
-      this.curveArray[dh_weightCurveSlot * l + x] = this.dirHorizontal.weightCurve.evaluate(u);
-      this.curveArray[dv_weightCurveSlot * l + x] = this.dirVertical.weightCurve.evaluate(u);
-      this.curveArray[n_weightCurveSlot * l + x] = this.noise.weightCurve.evaluate(u);
+      const l = CurveBufferLenght
+      let u = x / CurveBufferLenght
+      this.curveArray[sh_weightCurveSlot * l + x] = toByte(this.sineHorizontal.weightCurve.evaluate(u))
+      this.curveArray[sv_weightCurveSlot * l + x] = toByte(this.sineVertical.weightCurve.evaluate(u))
+      this.curveArray[sh_freqCurveSlot * l + x] = toByte(this.sineHorizontal.frequencyCurve.evaluate(u))
+      this.curveArray[sv_freqCurveSlot * l + x] = toByte(this.sineVertical.frequencyCurve.evaluate(u))
+      this.curveArray[dh_weightCurveSlot * l + x] = toByte(this.dirHorizontal.weightCurve.evaluate(u))
+      this.curveArray[dv_weightCurveSlot * l + x] = toByte(this.dirVertical.weightCurve.evaluate(u))
+      this.curveArray[n_weightCurveSlot * l + x] = toByte(this.noise.weightCurve.evaluate(u))
     }
     this.curves.setData(this.curveArray);
   }
@@ -230,7 +244,7 @@ export class Scanstort {
   }
 
   onValidate() {
-    if (
+    if (this.needsRefresh ||
       this.scale.isChanged() ||
       this.sineHorizontal.weight.isChanged() ||
       this.sineHorizontal.amplitude.isChanged() ||
@@ -253,7 +267,7 @@ export class Scanstort {
       this.amountX.isChanged() ||
       this.amountY.isChanged() ||
       this.globalAmount.isChanged()) {
-      this.needsBlit = true;
+      this.needsBlit = true
     }
   }
 
@@ -273,7 +287,7 @@ export class Scanstort {
   }
 
   start() {
-    this.curves = this.graphicsContext.newTexture(CurveBufferLenght, CurveBufferCount);
+    this.curves = this.graphicsContext.newTexture(CurveBufferLenght, CurveBufferCount, true);
     this.targetTexture = this.graphicsContext.newTexture(this.width, this.height);
     this.renderTexture = this.graphicsContext.newRenderTexture(this.width, this.height);
   
@@ -295,7 +309,6 @@ export class Scanstort {
     for (let x = 0; x < this.repeats.get(); x++) {
       ctx.fillText(this.text.get(), this.aspect(100), this.aspect(x * 80))
     }
-
     this.targetTexture.setData(this.cairo.getPixels(0, 0, this.width, this.height))
   }
 
@@ -311,7 +324,7 @@ export class Scanstort {
   getParameters(): JSX.Element {
     return (
       <div>
-        <NumberField ref={n => this.scale = n} min={0.01} max={9.0} title="Scale" default={0.5} />
+        <NumberField ref={n => this.scale = n} min={0.01} max={9.0} step={0.001} title="Scale" default={0.5} />
         <StringField ref={n => this.text = n} default="distort" title="Text" />
         <NumberField ref={n => this.textSize = n} min={1} max={200} step={1} default={78} title={"Font Size"} />
         <NumberField ref={n => this.repeats = n} min={0} max={20} step={1} default={10} title="Repeats" />

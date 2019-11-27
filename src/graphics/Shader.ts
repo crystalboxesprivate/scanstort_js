@@ -1,5 +1,5 @@
 export class Shader {
-  constructor(gl: WebGLRenderingContext, vertSource: string, fragSource:string) {
+  constructor(gl: WebGLRenderingContext, vertSource: string, fragSource: string) {
     this.gl = gl
 
     let vert = <WebGLShader>this.compileShader(
@@ -16,11 +16,9 @@ export class Shader {
       console.log('Shader program is not linked: ' + gl.getProgramInfoLog(this.program))
       return
     }
-    gl.useProgram(this.program)
     gl.useProgram(null)
   }
 
-  
   compileShader(src: string, type: number) {
     let gl = <WebGLRenderingContext>this.gl
     let typestring = 'vertex'
@@ -55,20 +53,39 @@ export class Shader {
     this.gl.useProgram(null)
   }
 
-  setTexture(name: string, texture: import("./Texture").Texture) {
+  setTexture(name: string, texture: import("./Texture").Texture, slot?: number) {
     this.bind()
-    throw new Error("Method not implemented.");
+    if (slot === null) {
+      slot = 0
+    }
+    let gl = this.gl
+    let glSlot = gl.TEXTURE0
+
+    switch (slot) {
+      case 0: default: { glSlot = gl.TEXTURE0; break; }
+      case 1: { glSlot = gl.TEXTURE1; break; }
+      case 2: { glSlot = gl.TEXTURE2; break; }
+    }
+
+    gl.uniform1i(gl.getUniformLocation(this.program, name), slot)
+    gl.activeTexture(glSlot)
+    gl.bindTexture(gl.TEXTURE_2D, texture.texture)
   }
+
   setInt(name: string, value: number) {
     this.bind()
-    throw new Error("Method not implemented.");
+    let gl = this.gl
+    gl.uniform1i(gl.getUniformLocation(this.program, name), value)
   }
+
   setVector(name: string, value: number[]) {
     this.bind()
-    throw new Error("Method not implemented.");
+    let gl = this.gl
+    gl.uniform4f(gl.getUniformLocation(this.program, name), value[0], value[1], value[2], value[3])
   }
+
   setFloat(name: string, value: number) {
     this.bind()
-    throw new Error("Method not implemented.");
+    this.gl.uniform1f(this.gl.getUniformLocation(this.program, name), value)
   }
 }

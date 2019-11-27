@@ -1,9 +1,9 @@
 import * as React from "react"
-import { IValueUpdatable } from "./old/interfaces/IValueUpdatable"
+type ValueCallback = (n: number) => any;
 
 export interface RangedSliderProps {
-  min: number, max: number, default: number,
-  step: number, title: String
+  min: number, max: number,  value: number,
+  step: number, title: string, onChange?: ValueCallback;
 }
 
 export interface RangedSliderState {
@@ -13,30 +13,37 @@ export interface RangedSliderState {
 export class RangedSlider extends React.Component<RangedSliderProps, {}> {
   props: RangedSliderProps
   state: RangedSliderState
+
+  changeEvent?: ValueCallback
   
   constructor(props: RangedSliderProps) {
     super(props)
     this.props = props
-    this.state = { value: +props.default }
+    this.state = { value: +props.value }
 
     this.handleChange = this.handleChange.bind(this)
     this.getInitialState = this.getInitialState.bind(this)
+    this.changeEvent = props.onChange
   }
 
   static defaultProps = {
     min: 0,
     max: 10,
-    default: 5,
     step: 1,
     title: "default",
+    value: 5,
   }
 
   getInitialState(): { value: number } {
-    return { value: +this.props.default }
+    return { value: +this.props.value }
   }
 
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ value: event.target.value })
+
+    if (this.changeEvent != null) {
+      this.changeEvent(this.state.value)
+    }
   }
 
   render() {

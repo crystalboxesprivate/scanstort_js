@@ -36,6 +36,8 @@ export class NumberField extends React.Component implements IParameter {
   constructor(props: NumberFieldProps) {
     super(props)
     this.props = props
+    this.state = { value: props.default }
+    this.handleChange = this.handleChange.bind(this)
   }
 
   setDirty(): void {
@@ -58,6 +60,10 @@ export class NumberField extends React.Component implements IParameter {
     this.setState({ value: value as number })
   }
 
+  handleChange(n: number) {
+    this.set(n)
+  }
+
   render() {
     if (this.props.type == NumberFieldRepresentation.TextField) {
       throw new Error("Not implemented")
@@ -66,9 +72,10 @@ export class NumberField extends React.Component implements IParameter {
         <RangedSlider
           min={this.props.min}
           max={this.props.max}
-          default={this.props.default}
+          value={this.state.value}
           step={this.props.step}
           title={this.props.title}
+          onChange={this.handleChange}
         />
       )
     }
