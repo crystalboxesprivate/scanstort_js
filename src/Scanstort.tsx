@@ -164,11 +164,11 @@ export class Scanstort {
     _material.setFloat("n_weight", this.noise.weight.get());
     _material.setFloat("n_complexity", this.noise.complexity.get());
     _material.setFloat("n_freq", this.noise.frequency.get());
-    _material.setVector("n_amp", [this.noise.ampX.get(), this.noise.ampY.get(), 0, 0]);
+    _material.setVector("n_amp", [this.noise.ampX.get(), this.noise.ampY.get()]);
     _material.setFloat("n_offset", this.noise.offset.get());
 
-    _material.setVector("_resolution", [this.width, this.height, 0, 0]);
-    _material.setVector("g_amount", [this.amountX.get(), this.amountY.get(), this.globalAmount.get(), 0]);
+    _material.setVector("_resolution", [this.width, this.height]);
+    _material.setVector("g_amount", [this.amountX.get(), this.amountY.get(), this.globalAmount.get()]);
 
     _material.setInt("sh_weightCurveSlot", sh_weightCurveSlot);
     _material.setInt("sh_freqCurveSlot", sh_freqCurveSlot);
@@ -228,16 +228,18 @@ export class Scanstort {
 
 
   onRenderImage() {
-    this.graphicsContext.present(this.renderTexture, this.materialPresent);
+    this.graphicsContext.present(this.renderTexture, this.materialPresent)
+    this.materialPresent.unbind()
   }
 
   update() {
     this.recache();
 
     if (this.needsBlit) {
-      this.updateUniforms();
-      this.graphicsContext.blit(this.targetTexture, this.renderTexture, this.material);
-      this.needsBlit = false;
+      this.updateUniforms()
+      this.graphicsContext.blit(this.targetTexture, this.renderTexture, this.material)
+      this.material.unbind()
+      this.needsBlit = false
     }
 
     this.onRenderImage()

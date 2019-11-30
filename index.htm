@@ -69,23 +69,23 @@
       uniform float sh_weight;
       uniform float sh_amp;
       uniform float sh_freq;
-      uniform float sh_weightCurveSlot;
-      uniform float sh_freqCurveSlot;
+      uniform int sh_weightCurveSlot;
+      uniform int sh_freqCurveSlot;
 
       uniform float sv_weight;
       uniform float sv_amp;
       uniform float sv_freq;
-      uniform float sv_weightCurveSlot;
-      uniform float sv_freqCurveSlot;
+      uniform int sv_weightCurveSlot;
+      uniform int sv_freqCurveSlot;
 
       uniform float dh_weight;
-      uniform float dh_weightCurveSlot;
+      uniform int dh_weightCurveSlot;
 
       uniform float dv_weight;
-      uniform float dv_weightCurveSlot;
+      uniform int dv_weightCurveSlot;
 
       uniform float n_weight;
-      uniform float n_weightCurveSlot;
+      uniform int n_weightCurveSlot;
       uniform float n_complexity;
       uniform float n_freq;
       uniform vec2 n_amp;
@@ -99,13 +99,13 @@
       uniform vec2 resolution;
       uniform vec2 curveRes;
 
-      float sampleCurve(float slot, float u) {
+      float sampleCurve(int slot, float u) {
          u = u < 0.0 ? 0.0 : u > 1.0 ? 1.0 : u;
 
          float width = curveRes.x;
          float slots = curveRes.y;
 
-         vec2 uv = vec2(u, slot / slots);
+         vec2 uv = vec2(u, float(slot) / slots);
          // return texture2D(curves, uv).x * 2.0;
          return 1.0;
       }

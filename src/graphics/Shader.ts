@@ -81,7 +81,15 @@ export class Shader {
   setVector(name: string, value: number[]) {
     this.bind()
     let gl = this.gl
-    gl.uniform4f(gl.getUniformLocation(this.program, name), value[0], value[1], value[2], value[3])
+    if (value.length == 2) {
+      gl.uniform2f(gl.getUniformLocation(this.program, name), value[0], value[1])
+    }
+    if (value.length == 3) {
+      gl.uniform3f(gl.getUniformLocation(this.program, name), value[0], value[1], value[2])
+    }
+    if (value.length == 4) {
+      gl.uniform4f(gl.getUniformLocation(this.program, name), value[0], value[1], value[2], value[3])
+    }
   }
 
   setFloat(name: string, value: number) {
